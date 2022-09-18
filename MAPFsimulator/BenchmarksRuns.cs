@@ -265,7 +265,7 @@ namespace MAPFsimulator
                         var numbers = mainForm.GetShuffleList(agentsPositions.Count, IntGenerator.GetInstance(), (repetitions > 1 || wholeTestRepetitions > 1));
                         for (int l = 0; l < min + i; l++)
                         {
-                            Agent a = new Agent(agentsPositions[numbers[l]][0], agentsPositions[numbers[l]][1], agentsPositions[numbers[l]][2], agentsPositions[numbers[l]][3], l);
+                            var a = new Agent(agentsPositions[numbers[l]][0], agentsPositions[numbers[l]][1], agentsPositions[numbers[l]][2], agentsPositions[numbers[l]][3], l);
                             model.LoadAgent(a);
                         }
                         int solLen = 0;

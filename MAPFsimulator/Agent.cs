@@ -1,14 +1,22 @@
 ﻿namespace MAPFsimulator
 {
+    interface IAgent
+    {
+        Vertex start { get; }
+        Vertex target { get; }
+        int id { get; set; }
+        Vertex Move(Vertex currentPosition, Plan plan);
+    }
+    
     /// <summary>
     /// Trida popisujici agenta. Kazdy agent ma svuj pocatecni a cilovy vrchol a svuj identifikator.
     /// </summary>
-    class Agent
+    class Agent : IAgent
     {
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
-
+        
         public Agent(Vertex start, Vertex target, int id)
         {
             this.id = id;
@@ -24,6 +32,11 @@
         public override string ToString()
         {
             return "Agent " + id + ": " + start + " --> " + target;
+        }
+        
+        public Vertex Move(Vertex currentPosition, Plan plan)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

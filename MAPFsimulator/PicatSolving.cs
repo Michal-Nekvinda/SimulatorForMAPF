@@ -19,7 +19,7 @@ namespace MAPFsimulator
         /// <param name="picatGraph">verze grafu upravena pro Picat - vznikne volanim metody ConvertForPicat() na prislusnem grafu</param>
         /// <param name="agents"></param>
         /// <returns>true, pokud byl prevod uspesny</returns>
-        private bool MapfToPicat(int r, int[,] picatGraph, List<Agent> agents)
+        private bool MapfToPicat(int r, int[,] picatGraph, IList<IAgent> agents)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace MAPFsimulator
         /// V novem vlakne vytvori proces, ve kterem spusti program s Picat resicem a preda mu soubor s deklarativnim modelem a souborem 
         /// s definici grafu a polohou agentu.
         /// </summary>
-        public List<Plan> SolveByPicat(int k, int[,] graph, List<Agent> agents)
+        public List<Plan> SolveByPicat(int k, int[,] graph, List<IAgent> agents)
         {
             if (!MapfToPicat(k, graph, agents))
                 return null;

@@ -9,7 +9,7 @@ namespace MAPFsimulator
     /// </summary>
     class MapfModel
     {
-        public List<Agent> agents { get; }
+        public List<IAgent> agents { get; }
         public Graph graph { get; set; }
         public List<Plan> solution { get; set; }
         
@@ -23,7 +23,7 @@ namespace MAPFsimulator
         /// </summary>
         public MapfModel()
         {
-            agents = new List<Agent>();
+            agents = new List<IAgent>();
         }
         /// <summary>
         /// Prida graf map do instance MAPF problemu.
@@ -75,7 +75,7 @@ namespace MAPFsimulator
         /// </summary>
         /// <param name="agent"></param>
         /// <returns>true, pokud doslo k pridani agenta</returns>
-        public bool LoadAndCheck(Agent agent)
+        public bool LoadAndCheck(IAgent agent)
         {
             foreach (var a in agents)
             {
@@ -91,7 +91,7 @@ namespace MAPFsimulator
         /// Prida agenta agent do instance MAPF problemu.
         /// </summary>
         /// <param name="agent"></param>
-        public void LoadAgent(Agent agent)
+        public void LoadAgent(IAgent agent)
         {
             agents.Add(agent);
             solution = null;
@@ -228,7 +228,7 @@ namespace MAPFsimulator
                 int picatRob = (robustnessType == RobustnessType.k) ? rob1 : 0;
                 //spusti resic Picat v jinem vlaknu
                 PicatSolving ps = new PicatSolving();
-                solution = ps.SolveByPicat(picatRob,graph.ConvertForPicat(),agents);
+                solution = ps.SolveByPicat(picatRob, graph.ConvertForPicat(), agents);
             }
             if (robustnessType==RobustnessType.semi_k || robustnessType==RobustnessType.alternative_k)
             {

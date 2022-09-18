@@ -87,7 +87,7 @@ namespace MAPFsimulator
         /// Vraci validni plan pro skupinu agentu agents v grafu g.
         /// Pokud plan neexistuje, nebo dojde-li k vyprseni casoveho limitu, vraci null.
         /// </summary>
-        public List<Plan> GetPlan(Graph g, List<Agent> agents)
+        public List<Plan> GetPlan(Graph g, List<IAgent> agents)
         {
             //cas
             sw.Restart();
