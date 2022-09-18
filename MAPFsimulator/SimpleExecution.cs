@@ -3,11 +3,16 @@ using System.Collections.Generic;
 
 namespace MAPFsimulator
 {
+    interface IPlansExecutor
+    { 
+        List<double>[] ExecuteSolution(List<Plan> plans, out string message, out Conflict conf, out int length);
+    }
+    
     /// <summary>
     /// Trida zajistujici provadeni planu.
     /// Simuluje exekuci planu s urcitou pravdepodobnosti zpozdeni a detekuje vrcholove konflikty a konflikty vymeny vrcholu.
     /// </summary>
-    class Execution
+    class SimpleExecution : IPlansExecutor
     {
         public int colTime = 0;
         public string colType = "";
@@ -27,7 +32,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Exekuce planu pro pocet agentu agents se zpozdenim delay.
         /// </summary>
-        public Execution(int agents, double delay)
+        public SimpleExecution(int agents, double delay)
         {
             this.agents = agents;
             positionsInTime = new List<double>[agents];
@@ -242,7 +247,7 @@ namespace MAPFsimulator
     /// Oproti klasicke exekuci musime hlidat vypocet abstraktnich pozic nasledniku - v normalnim pripade se jedna vzdy o posun o 1,
     /// zde to muze byt vic (pri presunu z hlavni na alternativni cestu)
     /// </summary>
-    class ContigencyExecution : Execution
+    class ContigencyExecution : SimpleExecution
     {
         int[] lastVertexNumbers;
         int[] currentDelays;
@@ -290,7 +295,7 @@ namespace MAPFsimulator
     /// Oproti klasicke exekuci pouzivame notaci poradove cislo vrcholu + cast hrany.
     /// Dale take umoznujeme menit rychlost, se kterou se agenti v grafu pohybuji.
     /// </summary>
-    class Min_MaxRobustExecution : Execution
+    class Min_MaxRobustExecution : SimpleExecution
     {
         List<Vertex> last;
         List<Vertex> next;

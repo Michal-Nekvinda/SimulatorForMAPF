@@ -10,9 +10,9 @@ namespace MAPFsimulator
     class MapfModel
     {
         public List<Agent> agents { get; }
-        public Graph graph { get; internal set; }
-        public List<Plan> solution { get; internal set; }
-
+        public Graph graph { get; set; }
+        public List<Plan> solution { get; set; }
+        
         //parametry pro hledani robustnich planu
         public RobustnessType typeOfSol { get; internal set; }
         public int solParameter1 { get; internal set; }
@@ -143,32 +143,36 @@ namespace MAPFsimulator
             {
                 return null;
             }
-            Execution ex;
+            
+            IPlansExecutor plansExecutor;
             //vyber exekuce dle typu robustnosti
             if (typeOfSol == RobustnessType.min_max)
             {
-                ex = new Min_MaxRobustExecution(agents.Count, solParameter1, solParameter2, delay);
+                plansExecutor = new Min_MaxRobustExecution(agents.Count, solParameter1, solParameter2, delay);
             }
             else
             {
                 if (typeOfSol == RobustnessType.alternative_k || typeOfSol == RobustnessType.semi_k)
                 {
-                    ex = new ContigencyExecution(agents.Count, delay);
+                    plansExecutor = new ContigencyExecution(agents.Count, delay);
                 }
                 else
                 {
-                    ex = new Execution(agents.Count, delay);
+                    plansExecutor = new SimpleExecution(agents.Count, delay);
                 }
 
             }
+            
             Conflict c;
-            var abstractPositions = ex.ExecuteSolution(solution, out exMessage, out c, out length);
+            var abstractPositions = plansExecutor.ExecuteSolution(solution, out exMessage, out c, out length);
+            
             if (typeOfSol == RobustnessType.min_max)
             {
                 double d = length / (double)solParameter1;
                 length = length / solParameter1;
                 length = DoubleToInt.DecimalPart(d) < 0.5 ? length : length + 1;
             }
+            
             if (exMessage == "ended successfully")
             {
                 exMessage = "Exekuce proběhla bez kolizí.";
@@ -183,22 +187,24 @@ namespace MAPFsimulator
         /// <summary>
         /// Najde plan pro zadany MAPF problem s pozadovanym typem robustnosti
         /// </summary>
-        /// <param name="rt">typ robustnosti, ktery v planu pozadujeme</param>
-        /// <param name="s">typ resice, kterym budeme plan hledat</param>
+        /// <param name="robustnessType">typ robustnosti, ktery v planu pozadujeme</param>
+        /// <param name="solver">typ resice, kterym budeme plan hledat</param>
         /// <param name="rob1">parametr robustnosti</param>
         /// <param name="rob2">druhy parametr robustnosti - validni pouze jako parametr max pro min/max robustnost</param>
         /// <param name="strict">true, pokud chceme striktni alternativni k-robustnost</param>
         /// <returns>Makespan nalezeno planu</returns>
-        public int FindSolution(RobustnessType rt, Solver s, int rob1, int rob2 = 0, bool strict = false)
+        public int FindSolution(RobustnessType robustnessType, Solver solver, int rob1, int rob2 = 0, bool strict = false)
         {
             solution = null;
-            typeOfSol = rt;
+            
+            typeOfSol = robustnessType;
             solParameter1 = rob1;
             solParameter2 = rob2;
-            if (s==Solver.CBS)
+            
+            if (solver==Solver.CBS)
             {
                 CBSsolver<Makespan> cbs = null;
-                switch (rt)
+                switch (robustnessType)
                 {
                     case RobustnessType.k:
                         if (rob1 > 0)
@@ -217,20 +223,20 @@ namespace MAPFsimulator
                 }
                 solution = cbs.GetPlan(graph, agents);
             }
-            if (s==Solver.Picat)
+            if (solver==Solver.Picat)
             {
-                int picatRob = (rt == RobustnessType.k) ? rob1 : 0;
+                int picatRob = (robustnessType == RobustnessType.k) ? rob1 : 0;
                 //spusti resic Picat v jinem vlaknu
                 PicatSolving ps = new PicatSolving();
                 solution = ps.SolveByPicat(picatRob,graph.ConvertForPicat(),agents);
             }
-            if (rt==RobustnessType.semi_k || rt==RobustnessType.alternative_k)
+            if (robustnessType==RobustnessType.semi_k || robustnessType==RobustnessType.alternative_k)
             {
                 WaitAddingRobustness war = new WaitAddingRobustness(solution);
                 //solution = war.GetRobustPlan(rob1);
             }
             //pridani alternativnich planu
-            if (rt==RobustnessType.semi_k)
+            if (robustnessType==RobustnessType.semi_k)
             {
                 SemiK_rob rob = new SemiK_rob();
                 var c_sol = rob.GetRobustPlan(solution, graph, agents, rob1);
@@ -241,7 +247,7 @@ namespace MAPFsimulator
                 else
                     solution = c_sol.Cast<Plan>().ToList();
             }
-            if (rt==RobustnessType.alternative_k)
+            if (robustnessType==RobustnessType.alternative_k)
             {
                 AlternativeK_rob rob = new AlternativeK_rob(rob1, strict);
                 var c_sol = rob.GetRobustPlan(solution, graph, agents, rob1);

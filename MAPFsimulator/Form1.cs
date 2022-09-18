@@ -538,25 +538,24 @@ namespace MAPFsimulator
             }
             else
             {
-                NextExecution();
+                ExecuteWithDelays();
             }
         }
         /// <summary>
-        /// Provede exekuci nalezeno reseni.
+        /// Provede exekuci nalezeneho reseni.
         /// </summary>
-        private void NextExecution()
+        private void ExecuteWithDelays()
         {
-            string result;
-            double delay = (double)numericUpDown3.Value;
-            abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out result);
-            scrollBarMax = abstractPositions.Max(p => p.Count-1);
+            var delay = (double)numericUpDown3.Value;
+            abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out var result);
+            scrollBarMax = abstractPositions.Max(p => p.Count - 1);
             ChangeState(State.ComputedSolution);
-            MessageBox.Show(result,"Exekuce ukončena",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            MessageBox.Show(result, "Exekuce ukončena", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void buttonNextExec_Click(object sender, EventArgs e)
         {
-            NextExecution();
+            ExecuteWithDelays();
         }
 
         /// <summary>
