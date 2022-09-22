@@ -1,6 +1,6 @@
 ﻿namespace MAPFsimulator
 {
-    interface IAgent
+    public interface IAgent
     {
         Vertex start { get; }
         Vertex target { get; }
@@ -34,6 +34,17 @@
             return "Agent " + id + ": " + start + " --> " + target;
         }
         
+        public Vertex Move(Vertex currentPosition, Plan plan)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    class SmartAgent : IAgent
+    {
+        public Vertex start { get; }
+        public Vertex target { get; }
+        public int id { get; set; }
         public Vertex Move(Vertex currentPosition, Plan plan)
         {
             throw new System.NotImplementedException();
