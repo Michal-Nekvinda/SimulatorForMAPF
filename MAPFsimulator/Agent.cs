@@ -5,7 +5,7 @@
         Vertex start { get; }
         Vertex target { get; }
         int id { get; set; }
-        Vertex Move(Vertex currentPosition, Plan plan);
+        Vertex NextVertexToMove(int vertexNumber, Plan plan, out int nextVertexNumber);
     }
     
     /// <summary>
@@ -16,7 +16,11 @@
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
-        
+        public Vertex NextVertexToMove(int vertexNumber, Plan plan, out int nextVertexNumber)
+        {
+            return plan.GetNext(vertexNumber, out nextVertexNumber);
+        }
+
         public Agent(Vertex start, Vertex target, int id)
         {
             this.id = id;
@@ -33,11 +37,6 @@
         {
             return "Agent " + id + ": " + start + " --> " + target;
         }
-        
-        public Vertex Move(Vertex currentPosition, Plan plan)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 
     class SmartAgent : IAgent
@@ -45,7 +44,7 @@
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
-        public Vertex Move(Vertex currentPosition, Plan plan)
+        public Vertex NextVertexToMove(int vertexNumber, Plan plan, out int nextVertexNumber)
         {
             throw new System.NotImplementedException();
         }

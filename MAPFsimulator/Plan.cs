@@ -7,7 +7,7 @@ namespace MAPFsimulator
     /// Datova struktura uchovavajici plan agenta v MAPF problemu.
     /// Plan je List vrcholu (struktura Vertex).
     /// </summary>
-    class Plan
+    public class Plan
     {
         //List vrcholu reprezentujici plan
         protected List<Vertex> path;
@@ -139,6 +139,21 @@ namespace MAPFsimulator
             return this.GetNth(DoubleToInt.ToInt(d));
         }
 
+        public virtual IList<int> GetAvailableVerticesFromPosition(int vertexNumber)
+        {
+            var vertexNumbers = new List<int> {vertexNumber};
+            if (vertexNumber < path.Count - 1)
+            {
+                vertexNumbers.Add(vertexNumber + 1);
+            }
+            if (vertexNumber > 0)
+            {
+                vertexNumbers.Add(vertexNumber - 1);
+            }
+            
+            return vertexNumbers;
+        }
+
         /// <summary>
         /// Vraci true, pokud je vrchol, ktery je vracen po zavolani metody GetNth(i), soucasti hlavniho planu.
         /// </summary>
@@ -196,15 +211,7 @@ namespace MAPFsimulator
         private int mainLength;
         //pomocna tabulka pro korektni vypis planu v metode ToString()
         private Dictionary<int, int> successors;
-        /// <summary>
-        /// Vytvori prazdny plan.
-        /// </summary>
-        public ContingencyPlan()
-        {
-            path = new List<Vertex>();
-            transitionTable = new Dictionary<int, List<Condition>>();
-            successors = new Dictionary<int, int>();
-        }
+
         /// <summary>
         /// Vytvori novy plan s alternativami a jako hlavni plan vezme list vrcholu mainPlan.
         /// </summary>
@@ -279,6 +286,19 @@ namespace MAPFsimulator
                 return path[conditions[0].successor];
             }
 
+        }
+
+        public override IList<int> GetAvailableVerticesFromPosition(int vertexNumber)
+        {
+            //TODO chybi predchudce
+            var vertexNumbers = new List<int> {vertexNumber};
+            var conditions = transitionTable[vertexNumber];
+            foreach (var condition in conditions)
+            {
+                vertexNumbers.Add(condition.successor);
+            }
+
+            return vertexNumbers;
         }
 
         /// <summary>

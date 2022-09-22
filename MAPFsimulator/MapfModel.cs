@@ -164,7 +164,7 @@ namespace MAPFsimulator
             }
             
             Conflict c;
-            var abstractPositions = plansExecutor.ExecuteSolution(solution, out exMessage, out c, out length);
+            var abstractPositions = plansExecutor.ExecuteSolution(solution, agents, out exMessage, out c, out length);
             
             if (typeOfSol == RobustnessType.min_max)
             {

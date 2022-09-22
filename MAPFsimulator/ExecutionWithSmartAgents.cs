@@ -4,50 +4,54 @@ namespace MAPFsimulator
 {
     public class ExecutionWithSmartAgents : IPlansExecutor
     {
-        int _colTime = 0;
-        string _colType = "";
-        double _delay;
-        List<double>[] _positionsInTime;
-        Queue<Vertex>[] _swapConfStruct;
-        int _agentsCount;
-        HashSet<Vertex> _currentVertices;
-        bool _vertexConflict;
-        bool _swappingConflict;
-        int _maxTime;
-        Conflict _confV;
+        private string _colType = "";
+
+        protected double delay;
+        //datova struktura s poradovymi cisly vrcholu, ve kterych se agenti nachazeji v danem case
+        protected List<double>[] positionsInTime;
+        //fronta pro detekci konfliktu vymeny vrcholu
+        Queue<Vertex>[] swapConfStruct;
+        protected int agentsCount;
+        HashSet<Vertex> currentVertices;
+        protected bool vertexConflict;
+        protected bool swappingConflict;
+        protected int maxTime;
+        protected Conflict confV;
 
         public ExecutionWithSmartAgents(int agentsCount, double delay)
         {
-            _agentsCount = agentsCount;
-            _positionsInTime = new List<double>[agentsCount];
-            _swapConfStruct = new Queue<Vertex>[agentsCount];
-            _delay = delay;
-            for (var i = 0; i < agentsCount; i++)
+            this.agentsCount = agentsCount;
+            positionsInTime = new List<double>[agentsCount];
+            swapConfStruct = new Queue<Vertex>[agentsCount];
+            this.delay = delay;
+            for (int i = 0; i < agentsCount; i++)
             {
-                _positionsInTime[i] = new List<double> {0};
-                _swapConfStruct[i] = new Queue<Vertex>();
+                positionsInTime[i] = new List<double>();
+                positionsInTime[i].Add(0);
+                swapConfStruct[i] = new Queue<Vertex>();
                 //vypln pomoci fiktivniho vrcholu
-                _swapConfStruct[i].Enqueue(new Vertex(-1, -1));
+                swapConfStruct[i].Enqueue(new Vertex(-1, -1));
             }
-            _maxTime = 1;
+            maxTime = 1;
         }
         
-        public MapfExecutionResult ExecuteSolution(List<Plan> plans, List<IAgent> agents)
+        public List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
         {
-            var result = new MapfExecutionResult();
+            //pocatecni nastaveni promennych
+            _colType = "normal";
             bool finished = false;
-            _vertexConflict = false;
-            _swappingConflict = false;
+            vertexConflict = false;
+            swappingConflict = false;
             int time = 1;
             for (int i = 0; i < plans.Count; i++)
             {
-                _swapConfStruct[i].Enqueue(plans[i].GetNth(0));
+                swapConfStruct[i].Enqueue(plans[i].GetNth(0));
             }
             //dokud nejsou vsichni agenti v cili
             while (!finished)
             {
                 finished = true;
-                _currentVertices = new HashSet<Vertex>();
+                currentVertices = new HashSet<Vertex>();
                 //pro plan kazdeho z agentu zacnu pocitat od casu 1 (cas 0 = startovni vrchol)
                 //positionsInTime[i][j] = poradove cislo vrcholu agenta i v case j (0 = start a tedy 1. vrchol cesty, 1 = 2.vrchol cesty,...)
                 for (int i = 0; i < plans.Count; i++)
@@ -55,93 +59,64 @@ namespace MAPFsimulator
                     //pokud ma zpozdeni, zustava tam, kde byl predtim
                     if (WillDelay(i, plans[i], time))
                     {
-                        _positionsInTime[i].Add(_positionsInTime[i][time - 1]);
+                        positionsInTime[i].Add(positionsInTime[i][time - 1]);
                     }
                     //jinak se posouva do dalsiho vrcholu
                     else
                     {
-                        _positionsInTime[i].Add(_positionsInTime[i][time - 1]);
+                        //TODO tady se musi rozhodovat agent
+                        positionsInTime[i].Add(positionsInTime[i][time - 1]);
                     }
                     //pokud nektery z agentu jeste neni v cili (ma pred sebou jeste nejake vrcholy), bude nasledovat dalsi iterace cyklu
-                    if (finished && plans[i].HasNextVertex(DoubleToInt.ToInt(_positionsInTime[i][time])))
+                    if (finished && plans[i].HasNextVertex(DoubleToInt.ToInt(positionsInTime[i][time])))
                     {
                         finished = false;
                     }
                     //zda byl objeven hranovy konflikt
-                    if (!_swappingConflict && !_vertexConflict && IsVertexConflict(i, plans[i], time, plans))
+                    if (!swappingConflict && !vertexConflict && IsVertexConflict(i, plans[i], time, plans))
                     {
-                        _vertexConflict = true;
+                        vertexConflict = true;
                     }
                 }
 
                 //kontrola swapping konfliktu
-                if (!_vertexConflict && !_swappingConflict && IsSwappingConflict(time))
+                if (!vertexConflict && !swappingConflict && IsSwappingConflict(time))
                 {
-                    _swappingConflict = true;
+                    swappingConflict = true;
                 }
                 time++;
             }
 
-            result.ExecutionLength = time - 1;
+            length = time - 1;
             if (new Makespan().GetCost(plans) == 0)
             {
-                result.ExecutionLength = 0;
+                length = 0;
             }
             //pri provadeni doslo ke kolizi
-            if (_vertexConflict || _swappingConflict)
+            if (vertexConflict || swappingConflict)
             {
-                result.Message = "ended with conflict";
-                _colTime = _confV.time;
-                TypOfConf(plans, _confV.agentID1, _confV.agentID2, DoubleToInt.ToInt(_positionsInTime[_confV.agentID1][_confV.time]), DoubleToInt.ToInt(_positionsInTime[_confV.agentID2][_confV.time]));
+                message = "ended with conflict";
+                TypOfConf(plans, confV.agentID1, confV.agentID2, DoubleToInt.ToInt(positionsInTime[confV.agentID1][confV.time]), DoubleToInt.ToInt(positionsInTime[confV.agentID2][confV.time]));
 
             }
             else
-            {
-                result.Message = "ended successfully";
-            }
+                message = "ended successfully";
 
-            result.Conflict = _confV;
-            result.AbstractPositions = _positionsInTime;
-            return result;
+            conf = confV;
+            return positionsInTime;
         }
         
         /// <summary>
-        /// Vraci true, pokud ma agentID s planem p v case t vrcholovy konflikt s jinym agentem.
-        /// </summary>
-        protected virtual bool IsVertexConflict(int agentId, Plan p, int t, List<Plan> plans)
-        {
-            var v = p.GetNth(_positionsInTime[agentId][t]);
-            _swapConfStruct[agentId].Dequeue();
-            _swapConfStruct[agentId].Enqueue(v);
-            //vrchol uz v hash setu je  - tedy mame konflikt - zbyva detekovat druheho z agentu
-            if (!_currentVertices.Add(v))
-            {
-                int theSecond = 0;
-                for (int i = 0; i < agentId; i++)
-                {
-                    if (v == plans[i].GetNth(_positionsInTime[i][t]))
-                    {
-                        theSecond = i;
-                        break;
-                    }
-                }
-                //konflikt ulozime a vratime po provedeni planu
-                _confV = new Conflict(agentId, theSecond, v, t);
-                return true;
-            }
-            return false;
-        }
-        /// <summary>
         /// Vraci true, pokud byl v planech agentu v case time detekovan konflikt vymeny vrcholu.
         /// </summary>
-        private bool IsSwappingConflict(int time)
+        protected virtual bool IsSwappingConflict(int time)
         {
-            for (var i = 0; i < _agentsCount; i++)
+            for (int i = 0; i < agentsCount; i++)
             {
-                for (var j = i + 1; j < _agentsCount; j++)
+                for (int j = i + 1; j < agentsCount; j++)
                 {
-                    var v1 = _swapConfStruct[i].Peek();
-                    var v2 = _swapConfStruct[j].Peek();
+                    Vertex v1 = swapConfStruct[i].Peek();
+                    Vertex v2 = swapConfStruct[j].Peek();
                     if (v1 == v2)
                     {
                         //maji vrcholovy konflikt
@@ -150,10 +125,10 @@ namespace MAPFsimulator
                     //kazda fronta ma prave 2 prvky
                     //agenti nemaji vrcholovy konflikt - to jsme zkontrolovali drive
                     //pokud tedy fronty navzajem obsahuji posledni pridane vrcholy, maji swapping conflict
-                    if (_swapConfStruct[i].Contains(v2) && _swapConfStruct[j].Contains(v1))
+                    if (swapConfStruct[i].Contains(v2) && swapConfStruct[j].Contains(v1))
                     {
                         //konflikt ulozime a vratime po provedeni planu
-                        _confV = new SwapConflict(i, j, v1, time, v2);
+                        confV = new SwapConflict(i, j, v1, time, v2);
                         return true;
                     }
                 }
@@ -163,16 +138,48 @@ namespace MAPFsimulator
         /// <summary>
         /// Vraci true, pokud se agentID v planu p v case t opozdi.
         /// </summary>
-        private bool WillDelay(int agentId, Plan p, int t)
+        protected virtual bool WillDelay(int agentID, Plan p, int t)
         {
+            bool inVertex = DoubleToInt.DecimalPart(positionsInTime[agentID][t - 1] / maxTime) == 0;
             //pokud agent mel provest akci wait, nebo uz je na konci planu, tak vratime false, protoze se nezpozdi
-            if (p.GetNth(_positionsInTime[agentId][t - 1]) == p.GetNth(_positionsInTime[agentId][t - 1] + 1))
+            if (inVertex && (p.GetNth(positionsInTime[agentID][t - 1]) ==
+                p.GetNth(positionsInTime[agentID][t - 1] + 1)))
             {
                 return false;
             }
-            var dd = DoubleGenerator.GetInstance().NextDouble();
-            return dd < _delay;
+            double dd = DoubleGenerator.GetInstance().NextDouble();
+            if (dd < delay)
+            {
+                return true;
+            }
+            return false;
         }
+        
+        protected bool IsVertexConflict(int agentID, Plan p, int t,List<Plan> plans)
+        {
+            Vertex v = p.GetNth(positionsInTime[agentID][t]);
+            swapConfStruct[agentID].Dequeue();
+            swapConfStruct[agentID].Enqueue(v);
+            //vrchol uz v hash setu je  - tedy mame konflikt - zbyva detekovat druheho z agentu
+            if (!currentVertices.Add(v))
+            {
+                int theSecond = 0;
+                for (int i = 0; i < agentID; i++)
+                {
+                    if (v == plans[i].GetNth(positionsInTime[i][t]))
+                    {
+                        theSecond = i;
+                        break;
+                    }
+                }
+                //konflikt ulozime a vratime po provedeni planu
+                confV = new Conflict(agentID, theSecond, v, t);
+                return true;
+            }
+            return false;
+        }
+
+        
         /// <summary>
         /// Rozlisuje, jaky typ konfliktu mezi agenty nastal (pro contigency robustnost).
         /// </summary>
@@ -180,11 +187,25 @@ namespace MAPFsimulator
         {
             if (plans[ag1].IsInMainPlan(vertex1))
             {
-                _colType = plans[ag2].IsInMainPlan(vertex2) ? "Hlavni" : "Hlavni+Vedlejsi";
+                if (plans[ag2].IsInMainPlan(vertex2))
+                {
+                    _colType = "Hlavni";
+                }
+                else
+                {
+                    _colType = "Hlavni+Vedlejsi";
+                }
             }
             else
             {
-                _colType = plans[ag2].IsInMainPlan(vertex2) ? "Hlavni+Vedlejsi" : "Vedlejsi";
+                if (plans[ag2].IsInMainPlan(vertex2))
+                {
+                    _colType = "Hlavni+Vedlejsi";
+                }
+                else
+                {
+                    _colType = "Vedlejsi";
+                }
             }
         }
     }

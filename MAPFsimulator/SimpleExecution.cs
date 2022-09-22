@@ -5,7 +5,7 @@ namespace MAPFsimulator
 {
     interface IPlansExecutor
     { 
-        List<double>[] ExecuteSolution(List<Plan> plans, out string message, out Conflict conf, out int length);
+        List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length);
     }
     
     /// <summary>
@@ -22,7 +22,7 @@ namespace MAPFsimulator
         protected List<double>[] positionsInTime;
         //fronta pro detekci konfliktu vymeny vrcholu
         Queue<Vertex>[] swapConfStruct;
-        protected int agents;
+        protected int agentsCount;
         HashSet<Vertex> currentVertices;
         protected bool vertexConflict;
         protected bool swappingConflict;
@@ -32,13 +32,13 @@ namespace MAPFsimulator
         /// <summary>
         /// Exekuce planu pro pocet agentu agents se zpozdenim delay.
         /// </summary>
-        public SimpleExecution(int agents, double delay)
+        public SimpleExecution(int agentsCount, double delay)
         {
-            this.agents = agents;
-            positionsInTime = new List<double>[agents];
-            swapConfStruct = new Queue<Vertex>[agents];
+            this.agentsCount = agentsCount;
+            positionsInTime = new List<double>[agentsCount];
+            swapConfStruct = new Queue<Vertex>[agentsCount];
             this.delay = delay;
-            for (int i = 0; i < agents; i++)
+            for (int i = 0; i < agentsCount; i++)
             {
                 positionsInTime[i] = new List<double>();
                 positionsInTime[i].Add(0);
@@ -48,16 +48,18 @@ namespace MAPFsimulator
             }
             maxTime = 1;
         }
+
         /// <summary>
         /// Provede exekuci planu ulozenych v listu plans. 
         /// </summary>
         /// <param name="plans"></param>
+        /// <param name="agents"></param>
         /// <param name="message">zprava o prubehu exekuce - zda skoncila uspesne, ci nikoliv</param>
         /// <param name="conf">pokud nastal konflikt, je vracena jeho instance, jinak je null</param>
         /// <param name="length">delka provedeneho planu (tedy i vcetne zpozdeni)</param>
         /// <returns>List abstraktnich pozic agentu v jednotlivych casovych usecich. 
         /// Abstraktni pozice je poradove cislo vrcholu v puvodnim nezpozdenem planu. Jedna se o desetinna cisla kvuli min/max robustnosti.</returns>
-        public List<double>[] ExecuteSolution(List<Plan> plans, out string message, out Conflict conf, out int length)
+        public List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
         {
             //pocatecni nastaveni promennych
             colTime = -1;
@@ -168,9 +170,9 @@ namespace MAPFsimulator
         /// </summary>
         protected virtual bool IsSwappingConflict(int time)
         {
-            for (int i = 0; i < agents; i++)
+            for (int i = 0; i < agentsCount; i++)
             {
-                for (int j = i + 1; j < agents; j++)
+                for (int j = i + 1; j < agentsCount; j++)
                 {
                     Vertex v1 = swapConfStruct[i].Peek();
                     Vertex v2 = swapConfStruct[j].Peek();
@@ -251,10 +253,10 @@ namespace MAPFsimulator
     {
         int[] lastVertexNumbers;
         int[] currentDelays;
-        public ContigencyExecution(int agents, double delay) : base(agents, delay)
+        public ContigencyExecution(int agentsCount, double delay) : base(agentsCount, delay)
         {
-            lastVertexNumbers = new int[agents];
-            currentDelays = new int[agents];
+            lastVertexNumbers = new int[agentsCount];
+            currentDelays = new int[agentsCount];
         }
         /// <summary>
         /// Na zaklade aktualniho zpozdeni agenta i v planu p vraci poradove cislo vrcholu, do ktereho agent pojede.
@@ -305,13 +307,13 @@ namespace MAPFsimulator
         /// <summary>
         /// Min/max robustni exekuce pro pocet agentu agentu agents, s pravdepodobnosti zpozdeni delay a parametry robustnosti minTime, maxTime. 
         /// </summary>
-        public Min_MaxRobustExecution(int agents, int minTime, int maxTime, double delay) : base(agents, delay)
+        public Min_MaxRobustExecution(int agentsCount, int minTime, int maxTime, double delay) : base(agentsCount, delay)
         {
             last = new List<Vertex>();
             next = new List<Vertex>();
-            edgePart = new double[agents];
-            currentSpeed = new double[agents];
-            for (int i = 0; i < agents; i++)
+            edgePart = new double[agentsCount];
+            currentSpeed = new double[agentsCount];
+            for (int i = 0; i < agentsCount; i++)
             {
                 currentSpeed[i] = 1.0 / maxTime;
             }
@@ -342,7 +344,7 @@ namespace MAPFsimulator
         /// </summary>
         protected override bool IsVertexConflict(int agentID, Plan p, int t,List<Plan> plans)
         {
-            if (last.Count==agents)
+            if (last.Count==agentsCount)
             {
                 last.Clear();
                 next.Clear();
@@ -363,9 +365,9 @@ namespace MAPFsimulator
         /// </summary>
         protected override bool IsSwappingConflict(int time)
         {
-            for (int i = 0; i < agents; i++)
+            for (int i = 0; i < agentsCount; i++)
             {
-                for (int j = i+1; j < agents; j++)
+                for (int j = i+1; j < agentsCount; j++)
                 {
                     //pokud 2 agenti vyjeli ze stejneho vrcholu
                     if (last[i]==last[j])
