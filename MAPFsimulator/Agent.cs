@@ -5,7 +5,7 @@
         Vertex start { get; }
         Vertex target { get; }
         int id { get; set; }
-        Vertex NextVertexToMove(int vertexNumber, Plan plan, out int nextVertexNumber);
+        int NextVertexToMove(int vertexNumber, Plan plan);
     }
     
     /// <summary>
@@ -16,9 +16,10 @@
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
-        public Vertex NextVertexToMove(int vertexNumber, Plan plan, out int nextVertexNumber)
+        public int NextVertexToMove(int vertexNumber, Plan plan)
         {
-            return plan.GetNext(vertexNumber, out nextVertexNumber);
+            plan.GetNext(vertexNumber, out var nextVertexNumber);
+            return nextVertexNumber;
         }
 
         public Agent(Vertex start, Vertex target, int id)
@@ -44,9 +45,10 @@
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
-        public Vertex NextVertexToMove(int vertexNumber, Plan plan, out int nextVertexNumber)
+        public int NextVertexToMove(int vertexNumber, Plan plan)
         {
-            throw new System.NotImplementedException();
+            var possibleMoves = plan.GetAvailableVerticesFromPosition(vertexNumber);
+            return possibleMoves[0];
         }
     }
 }
