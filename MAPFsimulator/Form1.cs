@@ -550,6 +550,14 @@ namespace MAPFsimulator
         private void ExecuteWithDelays()
         {
             var delay = (double)numericUpDown3.Value;
+            //TODO potom opravit
+            var oldAgents = new List<IAgent>(model.agents);
+            model.agents.Clear();
+            foreach (var agent in oldAgents)
+            {
+                model.agents.Add(AgentFactory.CreateAgent(agent.start, agent.target, agent.id, checkBoxSmart.Checked));
+            }
+            //
             abstractPositions = model.ExecuteSolution(delay, checkBoxSmart.Checked, out makespanOfExecution, out var result);
             scrollBarMax = abstractPositions.Max(p => p.Count - 1);
             ChangeState(State.ComputedSolution);

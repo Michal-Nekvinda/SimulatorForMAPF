@@ -53,6 +53,7 @@ namespace MAPFsimulator
                 swapConfStruct[i].Enqueue(plans[i].GetNth(0));
             }
             
+            //TODO opravit a zprovoznit pro smart agenty
             //dokud nejsou vsichni agenti v cili
             while (!finished)
             {
