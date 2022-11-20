@@ -78,7 +78,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Vraci pocet vrcholu planu.
         /// </summary>
-        public virtual int GetLenght()
+        public virtual int GetLength()
         {
             return path.Count;
         }
@@ -251,7 +251,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Vraci pocet vrcholu hlavniho planu.
         /// </summary>
-        public override int GetLenght()
+        public override int GetLength()
         {
             return mainLength;
         }

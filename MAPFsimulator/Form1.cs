@@ -712,7 +712,7 @@ namespace MAPFsimulator
             //nacteni agentu
             for (int i = 0; i < plans.Count; i++)
             {
-                var a = AgentFactory.CreateAgent(plans[i].GetNth(0), plans[i].GetNth(plans[i].GetLenght() - 1), i,
+                var a = AgentFactory.CreateAgent(plans[i].GetNth(0), plans[i].GetNth(plans[i].GetLength() - 1), i,
                     checkBoxSmart.Checked);
                 model.LoadAgent(a);
                 listBoxAgenti.Items.Add(a.ToString());
