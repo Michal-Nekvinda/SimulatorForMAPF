@@ -75,7 +75,7 @@ namespace MAPFsimulator
                         //mame fiktivniho agenta, ktery shani cestu z vrcholu, ktery jsme zvolili (cil ma stejny)
                         //cesta se zacne hledat od casu: 
                             //order [to je naplanovany cas prijezdu do vetviciho vrcholu] + duration [to je delka bezpecneho intervalu, tedy takove zpozdeni mi u agenta jeste nevadi a proto nepotrebujeme jit alternativou] + 1
-                        var fakeAgent = new Agent(v, agents[safeVio.agentID].target, safeVio.agentID);
+                        var fakeAgent = AgentFactory.CreateAgent(v, agents[safeVio.agentID].target, safeVio.agentID, false);
                         newAgents.Add(fakeAgent);
                         startTimes.Add(order + i);
                         vertexOrder.Add(order);

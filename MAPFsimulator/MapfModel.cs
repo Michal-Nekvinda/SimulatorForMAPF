@@ -135,7 +135,7 @@ namespace MAPFsimulator
         /// <param name="exMessage">zprava o prubehu exekuce</param>
         /// <returns>List abstraktnich pozic agentu v jednotlivych casovych usecich. 
         /// Abstraktni pozice je poradove cislo vrcholu v puvodnim nezpozdenem planu. </returns>
-        public List<double>[] ExecuteSolution(double delay, out int length, out string exMessage)
+        public List<double>[] ExecuteSolution(double delay, bool withSmartAgents, out int length, out string exMessage)
         {
             exMessage = "No solution for execution";
             length = -1;
@@ -154,7 +154,14 @@ namespace MAPFsimulator
             {
                 if (typeOfSol == RobustnessType.alternative_k || typeOfSol == RobustnessType.semi_k)
                 {
-                    plansExecutor = new ContigencyExecution(agents.Count, delay);
+                    if (withSmartAgents)
+                    {
+                        plansExecutor = new ExecutionWithSmartAgents(agents.Count, delay);
+                    }
+                    else
+                    {
+                        plansExecutor = new ContigencyExecution(agents.Count, delay);
+                    }
                 }
                 else
                 {

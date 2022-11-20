@@ -360,7 +360,8 @@ namespace MAPFsimulator
 
         private void AddAgentToModel(int[] position)
         {
-            Agent a = new Agent(position[0], position[1], position[2], position[3], listBoxAgenti.Items.Count);
+            var a = AgentFactory.CreateAgent(new Vertex(position[0], position[1]), new Vertex(position[2], position[3]),
+                listBoxAgenti.Items.Count, checkBoxSmart.Checked);
             if (model.LoadAndCheck(a))
             {
                 listBoxAgenti.Items.Add(a.ToString());
@@ -368,7 +369,7 @@ namespace MAPFsimulator
             }
             else
             {
-                MessageBox.Show(a.ToString()+" nelze vložit, protože jeho startovní nebo cílový vrchol je již obsazen jiným agentem.","Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(a +" nelze vložit, protože jeho startovní nebo cílový vrchol je již obsazen jiným agentem.","Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -505,12 +506,14 @@ namespace MAPFsimulator
             if (rt == RobustnessType.semi_k || rt == RobustnessType.alternative_k)
             {
                 groupBoxSolver.Text = "Řešič pro nalezení hlavního plánu";
-                checkBoxStrict.Visible = rt==RobustnessType.alternative_k;               
+                checkBoxStrict.Visible = rt == RobustnessType.alternative_k;
+                checkBoxSmart.Visible = rt == RobustnessType.alternative_k;
             }
             else
             {
                 groupBoxSolver.Text = "Řešič pro nalezení plánu";
                 checkBoxStrict.Visible = false;
+                checkBoxSmart.Visible = false;
             }
         }
 
@@ -547,7 +550,7 @@ namespace MAPFsimulator
         private void ExecuteWithDelays()
         {
             var delay = (double)numericUpDown3.Value;
-            abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out var result);
+            abstractPositions = model.ExecuteSolution(delay, checkBoxSmart.Checked, out makespanOfExecution, out var result);
             scrollBarMax = abstractPositions.Max(p => p.Count - 1);
             ChangeState(State.ComputedSolution);
             MessageBox.Show(result, "Exekuce ukončena", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -709,7 +712,8 @@ namespace MAPFsimulator
             //nacteni agentu
             for (int i = 0; i < plans.Count; i++)
             {
-                Agent a = new Agent(plans[i].GetNth(0), plans[i].GetNth(plans[i].GetLenght() - 1), i);
+                var a = AgentFactory.CreateAgent(plans[i].GetNth(0), plans[i].GetNth(plans[i].GetLenght() - 1), i,
+                    checkBoxSmart.Checked);
                 model.LoadAgent(a);
                 listBoxAgenti.Items.Add(a.ToString());
             }

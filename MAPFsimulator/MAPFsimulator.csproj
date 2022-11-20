@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="AgentFactory.cs" />
     <Compile Include="AgentsLoading.cs">
       <SubType>Form</SubType>
     </Compile>
