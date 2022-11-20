@@ -83,6 +83,8 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.checkBoxSmart = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBoxAgentAdding.SuspendLayout();
@@ -101,6 +103,7 @@
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -391,9 +394,9 @@
             this.tableLayoutPanel1.Controls.Add(this.comboBoxRobustType, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.groupBoxSolver, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.checkBoxStrict, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.GroupBoxDelay, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.buttonFindSol, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.panel2, 0, 3);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(7, 17);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -534,7 +537,7 @@
             // checkBoxStrict
             // 
             this.checkBoxStrict.AutoSize = true;
-            this.checkBoxStrict.Location = new System.Drawing.Point(2, 160);
+            this.checkBoxStrict.Location = new System.Drawing.Point(2, 2);
             this.checkBoxStrict.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxStrict.Name = "checkBoxStrict";
             this.checkBoxStrict.Size = new System.Drawing.Size(95, 17);
@@ -677,7 +680,7 @@
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 520F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 539F));
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.groupBoxGraphDraw, 0, 0);
             this.tableLayoutPanel2.Location = new System.Drawing.Point(1243, 24);
@@ -724,7 +727,7 @@
             // tableLayoutPanel5
             // 
             this.tableLayoutPanel5.ColumnCount = 1;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 1771F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel5.Controls.Add(this.listBox1, 0, 2);
             this.tableLayoutPanel5.Controls.Add(this.label1, 0, 1);
@@ -737,6 +740,28 @@
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108F));
             this.tableLayoutPanel5.Size = new System.Drawing.Size(1771, 235);
             this.tableLayoutPanel5.TabIndex = 37;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.checkBoxSmart);
+            this.panel2.Controls.Add(this.checkBoxStrict);
+            this.panel2.Location = new System.Drawing.Point(0, 158);
+            this.panel2.Margin = new System.Windows.Forms.Padding(0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(226, 24);
+            this.panel2.TabIndex = 6;
+            // 
+            // checkBoxSmart
+            // 
+            this.checkBoxSmart.AutoSize = true;
+            this.checkBoxSmart.Location = new System.Drawing.Point(129, 2);
+            this.checkBoxSmart.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxSmart.Name = "checkBoxSmart";
+            this.checkBoxSmart.Size = new System.Drawing.Size(96, 17);
+            this.checkBoxSmart.TabIndex = 4;
+            this.checkBoxSmart.Text = "SMART agenti";
+            this.checkBoxSmart.UseVisualStyleBackColor = true;
+            this.checkBoxSmart.Visible = false;
             // 
             // Form1
             // 
@@ -764,7 +789,6 @@
             this.groupBox5.PerformLayout();
             this.groupBoxSolverPicker.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
@@ -780,6 +804,8 @@
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -837,6 +863,8 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.ToolStripMenuItem nastaveníToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.CheckBox checkBoxSmart;
     }
 }
 
