@@ -21,9 +21,9 @@ namespace MAPFsimulator
         //datova struktura s poradovymi cisly vrcholu, ve kterych se agenti nachazeji v danem case
         protected List<double>[] positionsInTime;
         //fronta pro detekci konfliktu vymeny vrcholu
-        Queue<Vertex>[] swapConfStruct;
+        protected Queue<Vertex>[] swapConfStruct;
         protected int agentsCount;
-        HashSet<Vertex> currentVertices;
+        protected HashSet<Vertex> currentVertices;
         protected bool vertexConflict;
         protected bool swappingConflict;
         protected int maxTime;
@@ -59,7 +59,7 @@ namespace MAPFsimulator
         /// <param name="length">delka provedeneho planu (tedy i vcetne zpozdeni)</param>
         /// <returns>List abstraktnich pozic agentu v jednotlivych casovych usecich. 
         /// Abstraktni pozice je poradove cislo vrcholu v puvodnim nezpozdenem planu. Jedna se o desetinna cisla kvuli min/max robustnosti.</returns>
-        public List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
+        public virtual List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
         {
             //pocatecni nastaveni promennych
             colTime = -1;
@@ -89,7 +89,7 @@ namespace MAPFsimulator
                     //jinak se posouva do dalsiho vrcholu
                     else
                     {
-                        positionsInTime[i].Add(positionsInTime[i][time - 1] + CurrentSpeed(i, plans[i]));
+                        positionsInTime[i].Add(positionsInTime[i][time - 1] + CurrentSpeed(agents[i], i, plans[i]));
                     }
                     //pokud nektery z agentu jeste neni v cili (ma pred sebou jeste nejake vrcholy), bude nasledovat dalsi iterace cyklu
                     if (finished && plans[i].HasNextVertex(DoubleToInt.ToInt(positionsInTime[i][time])))
@@ -135,7 +135,7 @@ namespace MAPFsimulator
         /// Vraci aktualni rychlost, se kterou se agent i pohybuje ve svem planu p.
         /// Pro min/max robusnost se meni, pro ostatni je 1.
         /// </summary>
-        protected virtual double CurrentSpeed(int i, Plan p)
+        protected virtual double CurrentSpeed(IAgent agent, int i, Plan p)
         {
             return 1;
         }
@@ -195,14 +195,14 @@ namespace MAPFsimulator
             return false;
         }
         /// <summary>
-        /// Vraci true, pokud se agentID v planu p v case t opozdi.
+        /// Vraci true, pokud se agent v planu p v case t opozdi.
         /// </summary>
-        protected virtual bool WillDelay(int agentID, Plan p, int t)
+        protected virtual bool WillDelay(int i, Plan p, int t)
         {
-            bool inVertex = DoubleToInt.DecimalPart(positionsInTime[agentID][t - 1] / maxTime) == 0;
+            bool inVertex = DoubleToInt.DecimalPart(positionsInTime[i][t - 1] / maxTime) == 0;
             //pokud agent mel provest akci wait, nebo uz je na konci planu, tak vratime false, protoze se nezpozdi
-            if (inVertex && (p.GetNth(positionsInTime[agentID][t - 1]) ==
-                p.GetNth(positionsInTime[agentID][t - 1] + 1)))
+            if (inVertex && p.GetNth(positionsInTime[i][t - 1]) ==
+                p.GetNth(positionsInTime[i][t - 1] + 1))
             {
                 return false;
             }
@@ -216,7 +216,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Rozlisuje, jaky typ konfliktu mezi agenty nastal (pro contigency robustnost).
         /// </summary>
-        private void TypOfConf(List<Plan> plans, int ag1, int ag2, int vertex1, int vertex2)
+        protected void TypOfConf(List<Plan> plans, int ag1, int ag2, int vertex1, int vertex2)
         {
             if (plans[ag1].IsInMainPlan(vertex1))
             {
@@ -263,7 +263,7 @@ namespace MAPFsimulator
         /// Tedy za normalnich okolnosti se pohybuje po hlavnim planu (vzdy o 1), v pripade, ze prejizdi na alternativni plan,
         /// tak se pomoci teto metody vypocita rozdil poradovych cisel, o ktere se musi agent posunout, aby dale pokracoval v alternativnim planu.
         /// </summary>
-        protected override double CurrentSpeed(int i, Plan p)
+        protected override double CurrentSpeed(IAgent agent, int i, Plan p)
         {
             int newVertex;
             p.GetNext(lastVertexNumbers[i], out newVertex, currentDelays[i]);
@@ -272,20 +272,20 @@ namespace MAPFsimulator
             return newVertex - tmp;
         }
         /// <summary>
-        /// Vraci true, pokud se agentID v planu p v case t opozdi.
+        /// Vraci true, pokud se i-ty agent v planu p v case t opozdi.
         /// </summary>
-        protected override bool WillDelay(int agentID, Plan p, int t)
+        protected override bool WillDelay(int i, Plan p, int t)
         {
-            int tmp;
             //pokud agent mel provest akci wait, nebo uz je na konci planu, tak vratim false, protoze se nezpozdi
-            if (p.GetNth(positionsInTime[agentID][t - 1]) == p.GetNext(DoubleToInt.ToInt(positionsInTime[agentID][t - 1]), out tmp, currentDelays[agentID]))
+            if (p.GetNth(positionsInTime[i][t - 1]) ==
+                p.GetNext(DoubleToInt.ToInt(positionsInTime[i][t - 1]), out _, currentDelays[i]))
             {
                 return false;
             }
             double dd = DoubleGenerator.GetInstance().NextDouble();
             if (dd < delay)
             {
-                currentDelays[agentID]++;
+                currentDelays[i]++;
                 return true;
             }
             return false;
@@ -323,7 +323,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Aktualni rychlost agenta i v planu p.
         /// </summary>
-        protected override double CurrentSpeed(int i, Plan p)
+        protected override double CurrentSpeed(IAgent agent, int i, Plan p)
         {
             return currentSpeed[i];
         }

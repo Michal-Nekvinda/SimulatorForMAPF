@@ -2,58 +2,27 @@
 
 namespace MAPFsimulator
 {
-    public class ExecutionWithSmartAgents : IPlansExecutor
+    class ExecutionWithSmartAgents : SimpleExecution
     {
-        protected double delay;
-        //datova struktura s poradovymi cisly vrcholu, ve kterych se agenti nachazeji v danem case
-        List<double>[] positionsInTime;
-        //fronta pro detekci konfliktu vymeny vrcholu
-        Queue<Vertex>[] swapConfStruct;
-        int agentsCount;
-        HashSet<Vertex> currentVertices;
-        bool vertexConflict;
-        bool swappingConflict;
-        Conflict confV;
-
-        public ExecutionWithSmartAgents(int agentsCount, double delay)
+        int[] lastVertexNumbers;
+        public ExecutionWithSmartAgents(int agentsCount, double delay) : base(agentsCount, delay)
         {
-            this.agentsCount = agentsCount;
-            positionsInTime = new List<double>[agentsCount];
-            swapConfStruct = new Queue<Vertex>[agentsCount];
-            this.delay = delay;
-            for (var i = 0; i < agentsCount; i++)
-            {
-                positionsInTime[i] = new List<double>();
-                positionsInTime[i].Add(0);
-                swapConfStruct[i] = new Queue<Vertex>();
-                //vypln pomoci fiktivniho vrcholu
-                swapConfStruct[i].Enqueue(new Vertex(-1, -1));
-            }
+            lastVertexNumbers = new int[agentsCount];
         }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plans"></param>
-        /// <param name="agents"></param>
-        /// <param name="message"></param>
-        /// <param name="conf"></param>
-        /// <param name="length"></param>
-        /// <returns></returns>
-        public List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
+        public override List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
         {
             //pocatecni nastaveni promennych
-            var finished = false;
+            colTime = -1;
+            colType = "normal";
+            bool finished = false;
             vertexConflict = false;
             swappingConflict = false;
-            var time = 1;
-            
-            for (var i = 0; i < plans.Count; i++)
+            int time = 1;
+            for (int i = 0; i < plans.Count; i++)
             {
                 swapConfStruct[i].Enqueue(plans[i].GetNth(0));
             }
-            
-            //TODO opravit a zprovoznit pro smart agenty
             //dokud nejsou vsichni agenti v cili
             while (!finished)
             {
@@ -61,15 +30,20 @@ namespace MAPFsimulator
                 currentVertices = new HashSet<Vertex>();
                 //pro plan kazdeho z agentu zacnu pocitat od casu 1 (cas 0 = startovni vrchol)
                 //positionsInTime[i][j] = poradove cislo vrcholu agenta i v case j (0 = start a tedy 1. vrchol cesty, 1 = 2.vrchol cesty,...)
-                for (var i = 0; i < plans.Count; i++)
+                for (int i = 0; i < plans.Count; i++)
                 {
                     //pokud ma zpozdeni, zustava tam, kde byl predtim
-                    positionsInTime[i].Add(WillDelay()
-                        ? positionsInTime[i][time - 1]
-                        : agents[i].NextVertexToMove((int)positionsInTime[i][time - 1], plans[i]));
-                    
+                    if (WillDelay(i, plans[i], time))
+                    {
+                        positionsInTime[i].Add(positionsInTime[i][time - 1]);
+                    }
+                    //jinak se posouva do dalsiho vrcholu
+                    else
+                    {
+                        positionsInTime[i].Add(positionsInTime[i][time - 1] + CurrentSpeed(agents[i], i, plans[i]));
+                    }
                     //pokud nektery z agentu jeste neni v cili (ma pred sebou jeste nejake vrcholy), bude nasledovat dalsi iterace cyklu
-                    if (finished && plans[i].HasNextVertex((int)positionsInTime[i][time]))
+                    if (finished && plans[i].HasNextVertex(DoubleToInt.ToInt(positionsInTime[i][time])))
                     {
                         finished = false;
                     }
@@ -97,75 +71,30 @@ namespace MAPFsimulator
             if (vertexConflict || swappingConflict)
             {
                 message = "ended with conflict";
+                colTime = confV.time;
+                TypOfConf(plans, confV.agentID1, confV.agentID2, DoubleToInt.ToInt(positionsInTime[confV.agentID1][confV.time]), DoubleToInt.ToInt(positionsInTime[confV.agentID2][confV.time]));
+
             }
             else
-            {
                 message = "ended successfully";
-            }
 
             conf = confV;
             return positionsInTime;
         }
         
-        /// <summary>
-        /// Vraci true, pokud byl v planech agentu v case time detekovan konflikt vymeny vrcholu.
-        /// </summary>
-        protected virtual bool IsSwappingConflict(int time)
+        //Pro smart agenty neni potreba resit wait akce nebo konec planu, protoze si to agenti resi sami
+        protected override bool WillDelay(int i, Plan p, int t)
         {
-            for (var i = 0; i < agentsCount; i++)
-            {
-                for (var j = i + 1; j < agentsCount; j++)
-                {
-                    var v1 = swapConfStruct[i].Peek();
-                    var v2 = swapConfStruct[j].Peek();
-                    if (v1 == v2)
-                    {
-                        //maji vrcholovy konflikt
-                        return false;
-                    }
-                    //kazda fronta ma prave 2 prvky
-                    //agenti nemaji vrcholovy konflikt - to jsme zkontrolovali drive
-                    //pokud tedy fronty navzajem obsahuji posledni pridane vrcholy, maji swapping conflict
-                    if (swapConfStruct[i].Contains(v2) && swapConfStruct[j].Contains(v1))
-                    {
-                        //konflikt ulozime a vratime po provedeni planu
-                        confV = new SwapConflict(i, j, v1, time, v2);
-                        return true;
-                    }
-                }
-            }
-            return false;
+            double dd = DoubleGenerator.GetInstance().NextDouble();
+            return dd < delay;
         }
-        /// <summary>
-        /// Vraci true, pokud se agentID v planu p v case t opozdi.
-        /// </summary>
-        private bool WillDelay()
+        
+        protected override double CurrentSpeed(IAgent agent, int i, Plan p)
         {
-            return DoubleGenerator.GetInstance().NextDouble() < delay;
-        }
-
-        private bool IsVertexConflict(int agentId, Plan p, int t, List<Plan> plans)
-        {
-            var v = p.GetNth(positionsInTime[agentId][t]);
-            swapConfStruct[agentId].Dequeue();
-            swapConfStruct[agentId].Enqueue(v);
-            //vrchol uz v hash setu je  - tedy mame konflikt - zbyva detekovat druheho z agentu
-            if (currentVertices.Add(v))
-            {
-                return false;
-            }
-            var theSecond = 0;
-            for (var i = 0; i < agentId; i++)
-            {
-                if (v == plans[i].GetNth(positionsInTime[i][t]))
-                {
-                    theSecond = i;
-                    break;
-                }
-            }
-            //konflikt ulozime a vratime po provedeni planu
-            confV = new Conflict(agentId, theSecond, v, t);
-            return true;
+            var newVertexNumber = agent.NextVertexToMove(lastVertexNumbers[i], p);
+            int tmp = lastVertexNumbers[i];
+            lastVertexNumbers[i] = newVertexNumber;
+            return newVertexNumber - tmp;
         }
     }
 }
