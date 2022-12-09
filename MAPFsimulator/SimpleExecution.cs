@@ -59,7 +59,7 @@ namespace MAPFsimulator
         /// <param name="length">delka provedeneho planu (tedy i vcetne zpozdeni)</param>
         /// <returns>List abstraktnich pozic agentu v jednotlivych casovych usecich. 
         /// Abstraktni pozice je poradove cislo vrcholu v puvodnim nezpozdenem planu. Jedna se o desetinna cisla kvuli min/max robustnosti.</returns>
-        public virtual List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
+        public List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf, out int length)
         {
             //pocatecni nastaveni promennych
             colTime = -1;
@@ -108,6 +108,13 @@ namespace MAPFsimulator
                 {
                     swappingConflict = true;
                 }
+                
+                //update pozic agentu
+                for (int i = 0; i < agentsCount; i++)
+                {
+                    agents[i].SetCurrentPosition(DoubleToInt.ToInt(positionsInTime[i][time]), time, plans[i]);
+                }
+                
                 time++;
             }
 
