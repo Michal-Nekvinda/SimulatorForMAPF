@@ -210,7 +210,8 @@ namespace MAPFsimulator
         private int maxBranches = 1;
         private int mainLength;
         //pomocna tabulka pro korektni vypis planu v metode ToString()
-        private Dictionary<int, int> successors;
+        // -> tabulka predku pro takove vrcholy s poradovym cislem v, jejichz predkem neni vrchol s cislem v-1
+        private Dictionary<int, int> ancestors;
 
         /// <summary>
         /// Vytvori novy plan s alternativami a jako hlavni plan vezme list vrcholu mainPlan.
@@ -220,7 +221,7 @@ namespace MAPFsimulator
             path = new List<Vertex>();
             transitionTable = new Dictionary<int, List<Condition>>();
             AddMainPlan(mainPlan);
-            successors = new Dictionary<int, int>();
+            ancestors = new Dictionary<int, int>();
         }
         /// <summary>
         /// Vraci true, pokud je cislo i poradove cislo vrcholu, ktery patri do hlavniho planu.
@@ -285,19 +286,24 @@ namespace MAPFsimulator
                 }
                 return path[conditions[0].successor];
             }
-
         }
 
         public override IList<int> GetAvailableVerticesFromPosition(int vertexNumber)
         {
-            //TODO chybi predchudce
+            //podivame se, kam muzeme z vrcholu cislo vertexNumber prejit
             var vertexNumbers = new List<int> {vertexNumber};
             var conditions = transitionTable[vertexNumber];
             foreach (var condition in conditions)
             {
                 vertexNumbers.Add(condition.successor);
             }
-
+            
+            //predchudce
+            if (vertexNumber > 0)
+            {
+                var ancestor = ancestors.ContainsKey(vertexNumber) ? ancestors[vertexNumber] : vertexNumber -1;
+                vertexNumbers.Add(ancestor);
+            }
             return vertexNumbers;
         }
 
@@ -336,7 +342,7 @@ namespace MAPFsimulator
             path.AddRange(plan);
             //do prechodove tabulky predame informaci, ze se jedna o alternativu
             transitionTable[from].Add(c);
-            successors.Add(vertices, from);
+            ancestors.Add(vertices, from);
             if (transitionTable[from].Count > maxBranches)
             {
                 maxBranches = transitionTable[from].Count;
@@ -364,15 +370,19 @@ namespace MAPFsimulator
             else
             {
                 string p = "";
+                //prochazim vsechny vrcholy cesty
                 for (int i = 0; i < path.Count; i++)
                 {
+                    //pridam vrchol do vypisu
                     p += path[i].ToString();
+                    //pokud neni posledni, tak budu dal navazovat
                     if (i != path.Count - 1)
-                    {
+                    { 
+                        //pokud je vrchol sam sobe naslednikem, tak je na konci cesty a dalsi vrchol bude zacatek alternativni cesty
                         if (transitionTable[i][0].successor == i)
                         {
                             //pristi vrchol bude 1. vrchol alternativni cesty
-                            p += "  | ["+successors[i+1]+"]  ";
+                            p += "  | [" + ancestors[i + 1] + "]  ";
                         }
                         else
                             p += " --> ";
