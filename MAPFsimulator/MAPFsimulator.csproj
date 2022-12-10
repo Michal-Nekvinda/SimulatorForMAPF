@@ -78,6 +78,7 @@
     <Compile Include="Astar.cs" />
     <Compile Include="CBSsolver.cs" />
     <Compile Include="Communicator.cs" />
+    <Compile Include="Condition.cs" />
     <Compile Include="Conflict.cs" />
     <Compile Include="Constraint.cs" />
     <Compile Include="ContingencyRobustness.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="SmartAgent.cs" />
     <Compile Include="WaitAddingRobustness.cs" />
     <Compile Include="PlanTable.cs">
       <SubType>Form</SubType>

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MAPFsimulator
+﻿namespace MAPFsimulator
 {
     class ExecutionWithSmartAgents : SimpleExecution
     {
