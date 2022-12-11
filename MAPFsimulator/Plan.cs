@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MAPFsimulator
 {
@@ -139,19 +140,9 @@ namespace MAPFsimulator
             return this.GetNth(DoubleToInt.ToInt(d));
         }
 
-        public virtual IList<int> GetAvailableVerticesFromPosition(int vertexNumber)
+        public virtual IList<int> GetPossibleOptionsFromVertex(int vertexNumber)
         {
-            var vertexNumbers = new List<int> {vertexNumber};
-            if (vertexNumber < path.Count - 1)
-            {
-                vertexNumbers.Add(vertexNumber + 1);
-            }
-            if (vertexNumber > 0)
-            {
-                vertexNumbers.Add(vertexNumber - 1);
-            }
-            
-            return vertexNumbers;
+            return HasNextVertex(vertexNumber) ? new List<int> { vertexNumber + 1 } : new List<int> { vertexNumber };
         }
 
         /// <summary>
@@ -271,23 +262,12 @@ namespace MAPFsimulator
             }
         }
 
-        public override IList<int> GetAvailableVerticesFromPosition(int vertexNumber)
+        public override IList<int> GetPossibleOptionsFromVertex(int vertexNumber)
         {
             //podivame se, kam muzeme z vrcholu cislo vertexNumber prejit
-            var vertexNumbers = new List<int> {vertexNumber};
             var conditions = transitionTable[vertexNumber];
-            foreach (var condition in conditions)
-            {
-                vertexNumbers.Add(condition.successor);
-            }
-            
-            //predchudce
-            if (vertexNumber > 0)
-            {
-                var ancestor = ancestors.ContainsKey(vertexNumber) ? ancestors[vertexNumber] : vertexNumber -1;
-                vertexNumbers.Add(ancestor);
-            }
-            return vertexNumbers;
+
+            return conditions.Select(condition => condition.successor).ToList();
         }
 
         /// <summary>
