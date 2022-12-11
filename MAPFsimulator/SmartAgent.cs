@@ -9,7 +9,7 @@ namespace MAPFsimulator
         public Vertex target { get; }
         public int id { get; set; }
 
-        private Communicator _communicator;
+        protected Communicator _communicator;
 
         public SmartAgent(Vertex start, Vertex target, int id)
         {
@@ -23,7 +23,7 @@ namespace MAPFsimulator
         {
             return "SmartAgent " + id + ": " + start + " --> " + target;
         }
-
+        
         public virtual int NextVertexToMove(int vertexNumber, Plan plan, int delay = 0)
         {
             var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
@@ -48,8 +48,8 @@ namespace MAPFsimulator
 
             return bestOption;
         }
-
-        private int ComputeCollisionRisk(int option, Plan plan,
+        
+        protected int ComputeCollisionRisk(int option, Plan plan,
             Dictionary<int, Dictionary<Vertex, List<int>>> allAgentsPositions)
         {
             var path = ComputePathToNextBranching(option, plan);
@@ -78,7 +78,7 @@ namespace MAPFsimulator
             return timeToNextVisit;
         }
 
-        private int ComputeNextVertexVisit(int timeInVertex, List<int> timesOfOtherAgents)
+        protected int ComputeNextVertexVisit(int timeInVertex, List<int> timesOfOtherAgents)
         {
             if (timesOfOtherAgents.Max() < timeInVertex)
             {
@@ -88,7 +88,7 @@ namespace MAPFsimulator
             
             return diff.Where(x => x >= 0).Min();
         }
-        private List<Vertex> ComputePathToNextBranching(int vertexNumber, Plan plan)
+        protected List<Vertex> ComputePathToNextBranching(int vertexNumber, Plan plan)
         {
             var vertices = new List<Vertex>();
             var currentNumber = vertexNumber;
@@ -103,7 +103,7 @@ namespace MAPFsimulator
             return vertices;
         }
 
-        public void SetCurrentPosition(int vertexNumber, int time, Plan plan)
+        public virtual void SetCurrentPosition(int vertexNumber, int time, Plan plan)
         {
             var planToTarget = new Dictionary<Vertex, List<int>>();
             var currentVertexNumber = vertexNumber;
@@ -116,7 +116,7 @@ namespace MAPFsimulator
                 AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), currentVertexNumber);
             }
 
-            _communicator.UpdatePosition(vertexNumber, time, planToTarget);
+            _communicator.UpdatePosition(plan.GetNth(vertexNumber), new Vertex(), planToTarget);
         }
 
         private void AddToDictionary(Dictionary<Vertex, List<int>> dict, Vertex key, int value)
@@ -134,12 +134,78 @@ namespace MAPFsimulator
     
     class SmartAgentWithPolicy : SmartAgent
     {
+        private AgentState _currentState;
         private ICollisionPolicy _collisionPolicy;
         public SmartAgentWithPolicy(Vertex start, Vertex target, int id, ICollisionPolicy collisionPolicy) : base(start, target, id)
         {
             _collisionPolicy = collisionPolicy;
+            _currentState = AgentState.CAN_MOVE;
+        }
+
+        List<int> FilterOptionsByPolicy(IList<int> possibleOptions, Plan plan)
+        {
+            var filteredOptions = new List<int>();
+            foreach (var option in possibleOptions)
+            {
+                var v = plan.GetNth(option);
+                if (_collisionPolicy.GetVertexState(v) == VertexState.FREE)
+                {
+                    filteredOptions.Add(option);
+                }
+            }
+
+            return filteredOptions;
         }
         
+        public override int NextVertexToMove(int vertexNumber, Plan plan, int delay = 0)
+        {
+            var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
+            if (_collisionPolicy.GetMapfSolutionState() != MapfSolutionState.DEADLOCK)
+            {
+                possibleOptions = FilterOptionsByPolicy(possibleOptions, plan);
+            }
+            
+            //kvuli policy se nemohu posunout do zadneho z vrcholu dle planu
+            if (possibleOptions.Count == 0)
+            {
+                _currentState = AgentState.MUST_STAY;
+                return vertexNumber;
+            }
+
+            _currentState = AgentState.CAN_MOVE;
+            if (possibleOptions.Count == 1)
+            {
+                //v tomto kroku neni mozne vybrat jiny vrchol
+                return possibleOptions[0];
+            }
+
+            var allAgentsPositions = _communicator.GetAllAgentsPredictedPositions();
+            var bestOption = -1;
+            var minRisk = -1;
+            foreach (var option in possibleOptions)
+            {
+                var risk = ComputeCollisionRisk(option, plan, allAgentsPositions);
+                if (minRisk == -1 || risk < minRisk)
+                {
+                    minRisk = risk;
+                    bestOption = option;
+                }
+            }
+
+            return bestOption;
+        }
+
+        public override void SetCurrentPosition(int vertexNumber, int time, Plan plan)
+        {
+            base.SetCurrentPosition(vertexNumber, time, plan);
+            var possibleNextMoves = plan.GetPossibleOptionsFromVertex(vertexNumber);
+            foreach (var move in possibleNextMoves)
+            {
+                _collisionPolicy.SendRequest(time + 1, plan.GetNth(move));
+            }
+            _collisionPolicy.SendState(_currentState);
+        }
+
         public override string ToString()
         {
             return "SmartAgent with " + nameof(_collisionPolicy) + " policy" + id + ": " + start + " --> " + target;
