@@ -89,7 +89,7 @@ namespace MAPFsimulator
                     //jinak se posouva do dalsiho vrcholu
                     else
                     {
-                        positionsInTime[i].Add(positionsInTime[i][time - 1] + CurrentSpeed(agents[i], i, plans[i]));
+                        positionsInTime[i].Add(positionsInTime[i][time - 1] + CurrentSpeed(agents[i], i, plans[i], time));
                     }
                     //pokud nektery z agentu jeste neni v cili (ma pred sebou jeste nejake vrcholy), bude nasledovat dalsi iterace cyklu
                     if (finished && plans[i].HasNextVertex(DoubleToInt.ToInt(positionsInTime[i][time])))
@@ -142,7 +142,7 @@ namespace MAPFsimulator
         /// Vraci aktualni rychlost, se kterou se agent i pohybuje ve svem planu p.
         /// Pro min/max robusnost se meni, pro ostatni je 1.
         /// </summary>
-        protected virtual double CurrentSpeed(IAgent agent, int i, Plan p)
+        protected virtual double CurrentSpeed(IAgent agent, int i, Plan p, int time)
         {
             return 1;
         }
@@ -270,7 +270,7 @@ namespace MAPFsimulator
         /// Tedy za normalnich okolnosti se pohybuje po hlavnim planu (vzdy o 1), v pripade, ze prejizdi na alternativni plan,
         /// tak se pomoci teto metody vypocita rozdil poradovych cisel, o ktere se musi agent posunout, aby dale pokracoval v alternativnim planu.
         /// </summary>
-        protected override double CurrentSpeed(IAgent agent, int i, Plan p)
+        protected override double CurrentSpeed(IAgent agent, int i, Plan p, int time)
         {
             int newVertex;
             p.GetNext(lastVertexNumbers[i], out newVertex, currentDelays[i]);
@@ -330,7 +330,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Aktualni rychlost agenta i v planu p.
         /// </summary>
-        protected override double CurrentSpeed(IAgent agent, int i, Plan p)
+        protected override double CurrentSpeed(IAgent agent, int i, Plan p, int time)
         {
             return currentSpeed[i];
         }

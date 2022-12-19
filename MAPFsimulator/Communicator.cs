@@ -12,7 +12,7 @@ namespace MAPFsimulator
         
         public void UpdatePosition(Vertex current, Vertex next, Dictionary<Vertex, List<int>> planToTarget)
         {
-            AgentsPositionProvider.UpdatePosition(agentId, current, next, planToTarget); 
+            AgentsPositionProvider.UpdateAgentPosition(agentId, current, next, planToTarget); 
         }
         
         public Dictionary<int, Dictionary<Vertex, List<int>>> GetAllAgentsPredictedPositions()

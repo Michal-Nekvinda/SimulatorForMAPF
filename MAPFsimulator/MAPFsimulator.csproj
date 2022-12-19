@@ -87,6 +87,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="ExecutionWithSmartAgents.cs" />
     <Compile Include="Generator.cs" />
+    <Compile Include="MapfExceptions.cs" />
     <Compile Include="PicatSolving.cs" />
     <Compile Include="PlanProcessing.cs" />
     <Compile Include="AgentsPositionProvider.cs" />

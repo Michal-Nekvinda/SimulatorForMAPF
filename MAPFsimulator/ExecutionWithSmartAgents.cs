@@ -87,9 +87,9 @@
             return dd < delay;
         }
         
-        protected override double CurrentSpeed(IAgent agent, int i, Plan p)
+        protected override double CurrentSpeed(IAgent agent, int i, Plan p, int time)
         {
-            var newVertexNumber = agent.NextVertexToMove(lastVertexNumbers[i], p);
+            var newVertexNumber = agent.NextVertexToMove(time, lastVertexNumbers[i], p);
             int tmp = lastVertexNumbers[i];
             lastVertexNumbers[i] = newVertexNumber;
             return newVertexNumber - tmp;

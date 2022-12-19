@@ -24,7 +24,7 @@ namespace MAPFsimulator
             return "SmartAgent " + id + ": " + start + " --> " + target;
         }
         
-        public virtual int NextVertexToMove(int vertexNumber, Plan plan, int delay = 0)
+        public virtual int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
         {
             var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
             if (possibleOptions.Count == 1)
@@ -142,13 +142,13 @@ namespace MAPFsimulator
             _currentState = AgentState.CAN_MOVE;
         }
 
-        List<int> FilterOptionsByPolicy(IList<int> possibleOptions, Plan plan)
+        List<int> FilterOptionsByPolicy(int time, IList<int> possibleOptions, Plan plan)
         {
             var filteredOptions = new List<int>();
             foreach (var option in possibleOptions)
             {
                 var v = plan.GetNth(option);
-                if (_collisionPolicy.GetVertexState(v) == VertexState.FREE)
+                if (_collisionPolicy.GetVertexState(v, time) == VertexState.FREE)
                 {
                     filteredOptions.Add(option);
                 }
@@ -157,12 +157,12 @@ namespace MAPFsimulator
             return filteredOptions;
         }
         
-        public override int NextVertexToMove(int vertexNumber, Plan plan, int delay = 0)
+        public override int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
         {
             var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
-            if (_collisionPolicy.GetMapfSolutionState() != MapfSolutionState.DEADLOCK)
+            if (_collisionPolicy.MapfSolutionState != MapfSolutionState.DEADLOCK)
             {
-                possibleOptions = FilterOptionsByPolicy(possibleOptions, plan);
+                possibleOptions = FilterOptionsByPolicy(time, possibleOptions, plan);
             }
             
             //kvuli policy se nemohu posunout do zadneho z vrcholu dle planu
@@ -201,7 +201,7 @@ namespace MAPFsimulator
             var possibleNextMoves = plan.GetPossibleOptionsFromVertex(vertexNumber);
             foreach (var move in possibleNextMoves)
             {
-                _collisionPolicy.SendRequest(time + 1, plan.GetNth(move));
+                _collisionPolicy.SendRequest(plan.GetNth(move),time + 1);
             }
             _collisionPolicy.SendState(_currentState);
         }

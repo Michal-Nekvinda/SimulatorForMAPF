@@ -8,8 +8,9 @@
     
     public enum AgentState
     {
-        CAN_MOVE = 0,
-        MUST_STAY = 1,
+        UNKNOWN = 0,
+        CAN_MOVE = 1,
+        MUST_STAY = 2,
     }
 
     public enum VertexState
@@ -18,40 +19,41 @@
         BLOCKED = 1,
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ICollisionPolicy
     {
-        VertexState GetVertexState(Vertex vertex);
-        AgentState GetAgentState();
-        MapfSolutionState GetMapfSolutionState();
+        VertexState GetVertexState(Vertex vertex, int time);
+        MapfSolutionState MapfSolutionState { get; }
         void SendState(AgentState signal);
-        void SendRequest(int time, Vertex vertex);
+        void SendRequest(Vertex vertex, int time);
     }
     
     public class CollisionPolicy: ICollisionPolicy
     {
-        public VertexState GetVertexState(Vertex vertex)
+        private readonly int _agentId;
+        public CollisionPolicy(int agentId)
         {
-            throw new System.NotImplementedException();
+            _agentId = agentId;
         }
 
-        public MapfSolutionState GetMapfSolutionState()
+        public MapfSolutionState MapfSolutionState => AgentsPositionProvider.GetMapfSolutionState();
+
+        public VertexState GetVertexState(Vertex vertex, int time)
         {
-            throw new System.NotImplementedException();
-        }
+            return AgentsPositionProvider.GetVertexState(vertex, time, _agentId);  
+        } 
 
         public void SendState(AgentState signal)
         {
-            throw new System.NotImplementedException();
+            AgentsPositionProvider.UpdateAgentState(signal, _agentId);
+        }
+        
+        public void SendRequest(Vertex vertex, int time)
+        {
+            AgentsPositionProvider.BlockVertex(vertex, time, _agentId);
         }
 
-        public void SendRequest(int time, Vertex vertex)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public AgentState GetAgentState()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
