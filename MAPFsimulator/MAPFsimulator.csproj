@@ -81,6 +81,7 @@
     <Compile Include="Condition.cs" />
     <Compile Include="Conflict.cs" />
     <Compile Include="Constraint.cs" />
+    <Compile Include="ContingencyExecution.cs" />
     <Compile Include="ContingencyRobustness.cs" />
     <Compile Include="CostFunction.cs" />
     <Compile Include="DoubleToInt.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="ExecutionWithSmartAgents.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="MapfExceptions.cs" />
+    <Compile Include="Min_MaxRobustExecution.cs" />
     <Compile Include="PicatSolving.cs" />
     <Compile Include="PlanProcessing.cs" />
     <Compile Include="AgentsPositionProvider.cs" />

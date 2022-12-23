@@ -154,14 +154,7 @@ namespace MAPFsimulator
             {
                 if (typeOfSol == RobustnessType.alternative_k || typeOfSol == RobustnessType.semi_k)
                 {
-                    if (withSmartAgents)
-                    {
-                        plansExecutor = new ExecutionWithSmartAgents(agents.Count, delay);
-                    }
-                    else
-                    {
-                        plansExecutor = new ContigencyExecution(agents.Count, delay);
-                    }
+                    plansExecutor = new ContigencyExecution(agents.Count, delay);
                 }
                 else
                 {
