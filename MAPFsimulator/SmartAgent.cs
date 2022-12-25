@@ -2,28 +2,28 @@
 using System.Linq;
 
 namespace MAPFsimulator
-{ 
+{
     class SmartAgent : IAgent
     {
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
 
-        protected Communicator _communicator;
+        protected readonly Communicator communicator;
 
         public SmartAgent(Vertex start, Vertex target, int id)
         {
             this.id = id;
             this.start = start;
             this.target = target;
-            _communicator = new Communicator(id);
+            communicator = new Communicator(id);
         }
 
         public override string ToString()
         {
             return "SmartAgent " + id + ": " + start + " --> " + target;
         }
-        
+
         public virtual int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
         {
             var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
@@ -33,7 +33,7 @@ namespace MAPFsimulator
                 return possibleOptions[0];
             }
 
-            var allAgentsPositions = _communicator.GetAllAgentsPredictedPositions();
+            var allAgentsPositions = communicator.GetAllAgentsPredictedPositions();
             var bestOption = -1;
             var minRisk = -1;
             foreach (var option in possibleOptions)
@@ -48,7 +48,7 @@ namespace MAPFsimulator
 
             return bestOption;
         }
-        
+
         protected int ComputeCollisionRisk(int option, Plan plan,
             Dictionary<int, Dictionary<Vertex, List<int>>> allAgentsPositions)
         {
@@ -75,26 +75,29 @@ namespace MAPFsimulator
                     }
                 }
             }
+
             return timeToNextVisit;
         }
 
-        protected int ComputeNextVertexVisit(int timeInVertex, List<int> timesOfOtherAgents)
+        private int ComputeNextVertexVisit(int timeInVertex, IList<int> timesOfOtherAgents)
         {
             if (timesOfOtherAgents.Max() < timeInVertex)
             {
                 return int.MaxValue;
             }
+
             var diff = timesOfOtherAgents.Select(t => t - timeInVertex);
-            
+
             return diff.Where(x => x >= 0).Min();
         }
-        protected List<Vertex> ComputePathToNextBranching(int vertexNumber, Plan plan)
+
+        private List<Vertex> ComputePathToNextBranching(int vertexNumber, Plan plan)
         {
             var vertices = new List<Vertex>();
             var currentNumber = vertexNumber;
             vertices.Add(plan.GetNth(vertexNumber));
-            
-            while (plan.GetPossibleOptionsFromVertex(currentNumber).Count <= 1)
+
+            while (plan.HasNextVertex(currentNumber) && plan.GetPossibleOptionsFromVertex(currentNumber).Count <= 1)
             {
                 vertices.Add(plan.GetNext(currentNumber, out var next));
                 currentNumber = next;
@@ -111,15 +114,15 @@ namespace MAPFsimulator
             AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), currentVertexNumber);
             while (plan.HasNextVertex(currentVertexNumber))
             {
-                var nextVertex = plan.GetNext(currentVertexNumber, out int nextNumber);
+                plan.GetNext(currentVertexNumber, out int nextNumber);
                 currentVertexNumber = nextNumber;
                 AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), currentVertexNumber);
             }
 
-            _communicator.UpdatePosition(plan.GetNth(vertexNumber), new Vertex(), planToTarget);
+            communicator.UpdatePosition(planToTarget);
         }
 
-        private void AddToDictionary(Dictionary<Vertex, List<int>> dict, Vertex key, int value)
+        private void AddToDictionary(IDictionary<Vertex, List<int>> dict, Vertex key, int value)
         {
             if (dict.ContainsKey(key))
             {
@@ -131,12 +134,14 @@ namespace MAPFsimulator
             }
         }
     }
-    
+
     class SmartAgentWithPolicy : SmartAgent
     {
         private AgentState _currentState;
         private ICollisionPolicy _collisionPolicy;
-        public SmartAgentWithPolicy(Vertex start, Vertex target, int id, ICollisionPolicy collisionPolicy) : base(start, target, id)
+
+        public SmartAgentWithPolicy(Vertex start, Vertex target, int id, ICollisionPolicy collisionPolicy) : base(start,
+            target, id)
         {
             _collisionPolicy = collisionPolicy;
             _currentState = AgentState.CAN_MOVE;
@@ -156,7 +161,7 @@ namespace MAPFsimulator
 
             return filteredOptions;
         }
-        
+
         public override int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
         {
             var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
@@ -164,7 +169,7 @@ namespace MAPFsimulator
             {
                 possibleOptions = FilterOptionsByPolicy(time, possibleOptions, plan);
             }
-            
+
             //kvuli policy se nemohu posunout do zadneho z vrcholu dle planu
             if (possibleOptions.Count == 0)
             {
@@ -179,7 +184,7 @@ namespace MAPFsimulator
                 return possibleOptions[0];
             }
 
-            var allAgentsPositions = _communicator.GetAllAgentsPredictedPositions();
+            var allAgentsPositions = communicator.GetAllAgentsPredictedPositions();
             var bestOption = -1;
             var minRisk = -1;
             foreach (var option in possibleOptions)
@@ -201,8 +206,9 @@ namespace MAPFsimulator
             var possibleNextMoves = plan.GetPossibleOptionsFromVertex(vertexNumber);
             foreach (var move in possibleNextMoves)
             {
-                _collisionPolicy.SendRequest(plan.GetNth(move),time + 1);
+                _collisionPolicy.SendRequest(plan.GetNth(move), time + 1);
             }
+
             _collisionPolicy.SendState(_currentState);
         }
 

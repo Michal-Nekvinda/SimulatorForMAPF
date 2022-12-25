@@ -304,7 +304,7 @@ namespace MAPFsimulator
                         {
                             int length;
                             string message;
-                            var x = model.ExecuteSolution(delay, checkBoxSmart.Checked, out length, out message);
+                            var x = model.ExecuteSolution(delay, out length, out message);
 
                             abstractPlans[ii][k].Add(x);
                             avgMakespan += length;

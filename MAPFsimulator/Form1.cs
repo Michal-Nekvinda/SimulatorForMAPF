@@ -541,16 +541,16 @@ namespace MAPFsimulator
             }
             else
             {
-                ExecuteWithDelays();
+                ExecuteSolutionWithDelay();
             }
         }
         /// <summary>
         /// Provede exekuci nalezeneho reseni.
         /// </summary>
-        private void ExecuteWithDelays()
+        private void ExecuteSolutionWithDelay()
         {
             var delay = (double)numericUpDown3.Value;
-            //TODO potom opravit
+            //TODO potom opravit - kdy vybirat smart agenta?
             var oldAgents = new List<IAgent>(model.agents);
             model.agents.Clear();
             foreach (var agent in oldAgents)
@@ -558,7 +558,7 @@ namespace MAPFsimulator
                 model.agents.Add(AgentFactory.CreateAgent(agent.start, agent.target, agent.id, checkBoxSmart.Checked));
             }
             //
-            abstractPositions = model.ExecuteSolution(delay, checkBoxSmart.Checked, out makespanOfExecution, out var result);
+            abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out var result);
             scrollBarMax = abstractPositions.Max(p => p.Count - 1);
             ChangeState(State.ComputedSolution);
             MessageBox.Show(result, "Exekuce ukončena", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -566,7 +566,7 @@ namespace MAPFsimulator
 
         private void buttonNextExec_Click(object sender, EventArgs e)
         {
-            ExecuteWithDelays();
+            ExecuteSolutionWithDelay();
         }
 
         /// <summary>

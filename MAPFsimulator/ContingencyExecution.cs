@@ -5,11 +5,11 @@
     /// Oproti klasicke exekuci musime hlidat vypocet abstraktnich pozic nasledniku - v normalnim pripade se jedna vzdy o posun o 1,
     /// zde to muze byt vic (pri presunu z hlavni na alternativni cestu)
     /// </summary>
-    class ContigencyExecution : SimpleExecution
+    class ContingencyExecution : SimpleExecution
     {
         int[] lastVertexNumbers;
         int[] currentDelays;
-        public ContigencyExecution(int agentsCount, double delay) : base(agentsCount, delay)
+        public ContingencyExecution(int agentsCount, double delay) : base(agentsCount, delay)
         {
             lastVertexNumbers = new int[agentsCount];
             currentDelays = new int[agentsCount];
