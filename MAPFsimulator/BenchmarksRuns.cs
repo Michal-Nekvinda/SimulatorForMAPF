@@ -363,7 +363,8 @@ namespace MAPFsimulator
             //konec vsech testu
 
             Array.Sort(solvedInstances);
-            textBoxLog.AppendText("Medián vyřešených instancí v časovém limitu testu: "+ solvedInstances[(wholeTestRepetitions-1)/2].ToString()+"\n");
+            textBoxLog.AppendText("Medián vyřešených instancí v časovém limitu testu: "+ solvedInstances[(wholeTestRepetitions-1)/2]);
+            textBoxLog.AppendText(Environment.NewLine);
             //vysledek pripravim do schranky pro kopirovani a vypisu do logu
             ResultsToClipboard();
             buttonBenchmarkRun.Enabled = true;

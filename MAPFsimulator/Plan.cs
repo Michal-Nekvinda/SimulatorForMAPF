@@ -142,7 +142,8 @@ namespace MAPFsimulator
 
         public virtual IList<int> GetPossibleOptionsFromVertex(int vertexNumber)
         {
-            return HasNextVertex(vertexNumber) ? new List<int> { vertexNumber + 1 } : new List<int> { vertexNumber };
+            GetNext(vertexNumber, out var ret);
+            return new List<int>{ret};
         }
 
         /// <summary>
