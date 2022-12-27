@@ -67,8 +67,6 @@
             this.labelSolver = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.checkBoxSmart = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.textBoxRepetitionExec = new System.Windows.Forms.TextBox();
@@ -76,6 +74,8 @@
             this.textBoxRepetition = new System.Windows.Forms.TextBox();
             this.labelPath = new System.Windows.Forms.Label();
             this.numericUpDownTestRep = new System.Windows.Forms.NumericUpDown();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.checkBoxSmart = new System.Windows.Forms.CheckBox();
             this.listBoxExecutions = new System.Windows.Forms.ListBox();
             this.buttonStopRunning = new System.Windows.Forms.Button();
             this.textBoxLog = new System.Windows.Forms.TextBox();
@@ -109,9 +109,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStep)).BeginInit();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTestRep)).BeginInit();
+            this.panel1.SuspendLayout();
             this.groupBoxDone.SuspendLayout();
             this.panel3.SuspendLayout();
             this.SuspendLayout();
@@ -128,7 +128,7 @@
             // 
             // buttonAgentsChoice
             // 
-            this.buttonAgentsChoice.Location = new System.Drawing.Point(206, 57);
+            this.buttonAgentsChoice.Location = new System.Drawing.Point(7, 6);
             this.buttonAgentsChoice.Margin = new System.Windows.Forms.Padding(11, 10, 11, 10);
             this.buttonAgentsChoice.Name = "buttonAgentsChoice";
             this.buttonAgentsChoice.Size = new System.Drawing.Size(75, 30);
@@ -185,13 +185,13 @@
             this.tableLayoutPanel3.Controls.Add(this.agentiCesta, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.agentiPocet, 1, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(478, 49);
-            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(483, 59);
+            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(8, 12, 8, 8);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(403, 46);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(393, 30);
             this.tableLayoutPanel3.TabIndex = 9;
             // 
             // agentiCesta
@@ -205,14 +205,14 @@
             // agentiPocet
             // 
             this.agentiPocet.AutoSize = true;
-            this.agentiPocet.Location = new System.Drawing.Point(211, 0);
+            this.agentiPocet.Location = new System.Drawing.Point(206, 0);
             this.agentiPocet.Name = "agentiPocet";
             this.agentiPocet.Size = new System.Drawing.Size(0, 17);
             this.agentiPocet.TabIndex = 1;
             // 
             // buttonBenchmarkRun
             // 
-            this.buttonBenchmarkRun.Location = new System.Drawing.Point(6, 2);
+            this.buttonBenchmarkRun.Location = new System.Drawing.Point(5, 2);
             this.buttonBenchmarkRun.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonBenchmarkRun.Name = "buttonBenchmarkRun";
             this.buttonBenchmarkRun.Size = new System.Drawing.Size(132, 41);
@@ -378,10 +378,10 @@
             this.checkBoxStrict.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBoxStrict.AutoSize = true;
-            this.checkBoxStrict.Location = new System.Drawing.Point(0, 2);
+            this.checkBoxStrict.Location = new System.Drawing.Point(3, 47);
             this.checkBoxStrict.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBoxStrict.Name = "checkBoxStrict";
-            this.checkBoxStrict.Size = new System.Drawing.Size(118, 21);
+            this.checkBoxStrict.Size = new System.Drawing.Size(268, 21);
             this.checkBoxStrict.TabIndex = 1;
             this.checkBoxStrict.Text = "striktní přístup";
             this.checkBoxStrict.UseVisualStyleBackColor = true;
@@ -427,14 +427,13 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 280F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 409F));
             this.tableLayoutPanel2.Controls.Add(this.label5, 0, 8);
-            this.tableLayoutPanel2.Controls.Add(this.agentsMin, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.panel2, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.agentsMin, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.groupBox3, 2, 5);
             this.tableLayoutPanel2.Controls.Add(this.groupBoxSolver, 1, 6);
             this.tableLayoutPanel2.Controls.Add(this.label7, 0, 3);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel4, 2, 3);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 2, 1);
-            this.tableLayoutPanel2.Controls.Add(this.buttonAgentsChoice, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.label3, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.label2, 0, 1);
@@ -449,6 +448,7 @@
             this.tableLayoutPanel2.Controls.Add(this.textBoxRepetition, 1, 4);
             this.tableLayoutPanel2.Controls.Add(this.labelPath, 2, 0);
             this.tableLayoutPanel2.Controls.Add(this.numericUpDownTestRep, 1, 8);
+            this.tableLayoutPanel2.Controls.Add(this.panel1, 1, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 17);
             this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -606,8 +606,8 @@
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.checkBoxStrict, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.comboBoxRobustType, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(198, 273);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -618,30 +618,6 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(274, 82);
             this.tableLayoutPanel1.TabIndex = 5;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.checkBoxSmart);
-            this.panel1.Controls.Add(this.checkBoxStrict);
-            this.panel1.Location = new System.Drawing.Point(4, 49);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(266, 29);
-            this.panel1.TabIndex = 1;
-            // 
-            // checkBoxSmart
-            // 
-            this.checkBoxSmart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.checkBoxSmart.AutoSize = true;
-            this.checkBoxSmart.Location = new System.Drawing.Point(137, 2);
-            this.checkBoxSmart.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.checkBoxSmart.Name = "checkBoxSmart";
-            this.checkBoxSmart.Size = new System.Drawing.Size(121, 21);
-            this.checkBoxSmart.TabIndex = 2;
-            this.checkBoxSmart.Text = "SMART agenti";
-            this.checkBoxSmart.UseVisualStyleBackColor = true;
-            this.checkBoxSmart.Visible = false;
             // 
             // label8
             // 
@@ -728,6 +704,30 @@
             0,
             0,
             0});
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.checkBoxSmart);
+            this.panel1.Controls.Add(this.buttonAgentsChoice);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(199, 51);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(272, 42);
+            this.panel1.TabIndex = 1;
+            // 
+            // checkBoxSmart
+            // 
+            this.checkBoxSmart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkBoxSmart.AutoSize = true;
+            this.checkBoxSmart.Location = new System.Drawing.Point(107, 10);
+            this.checkBoxSmart.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBoxSmart.Name = "checkBoxSmart";
+            this.checkBoxSmart.Size = new System.Drawing.Size(121, 21);
+            this.checkBoxSmart.TabIndex = 2;
+            this.checkBoxSmart.Text = "SMART agenti";
+            this.checkBoxSmart.UseVisualStyleBackColor = true;
             // 
             // listBoxExecutions
             // 
@@ -940,6 +940,7 @@
             this.panel3.Controls.Add(this.buttonBenchmarkRun);
             this.panel3.Controls.Add(this.buttonStopRunning);
             this.panel3.Location = new System.Drawing.Point(15, 567);
+            this.panel3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(375, 47);
             this.panel3.TabIndex = 48;
@@ -949,7 +950,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(2071, 987);
+            this.ClientSize = new System.Drawing.Size(1947, 1008);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.buttonVisualize);
             this.Controls.Add(this.checkBox1);
@@ -987,11 +988,12 @@
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTestRep)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.groupBoxDone.ResumeLayout(false);
             this.groupBoxDone.PerformLayout();
             this.panel3.ResumeLayout(false);

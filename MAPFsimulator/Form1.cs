@@ -350,7 +350,7 @@ namespace MAPFsimulator
                         return;
                     }
                 }
-                AddAgentToModel(position);
+                AddAgentToModel(position, checkBoxSmart.Checked);
                 ChangeState(State.AgentLoaded);
 
             }
@@ -358,10 +358,10 @@ namespace MAPFsimulator
                 MessageBox.Show("Zadejte pozici agenta ve formatu startX, startY, cilX, cilY", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void AddAgentToModel(int[] position)
+        private void AddAgentToModel(int[] position, bool isSmart)
         {
             var a = AgentFactory.CreateAgent(new Vertex(position[0], position[1]), new Vertex(position[2], position[3]),
-                listBoxAgenti.Items.Count, checkBoxSmart.Checked);
+                listBoxAgenti.Items.Count, isSmart);
             if (model.LoadAndCheck(a))
             {
                 listBoxAgenti.Items.Add(a.ToString());
@@ -439,7 +439,7 @@ namespace MAPFsimulator
                                 var shuffleIndexes = GetShuffleList(agents.Count, IntGenerator.GetInstance(), al.randomChoice);
                                 for (int i = 0; i < al.n; i++)
                                 {
-                                    AddAgentToModel(agents[shuffleIndexes[i]]);
+                                    AddAgentToModel(agents[shuffleIndexes[i]], al.smartAgents);
                                 }
                                 if (model.agents.Count > 0)
                                 {
@@ -507,13 +507,11 @@ namespace MAPFsimulator
             {
                 groupBoxSolver.Text = "Řešič pro nalezení hlavního plánu";
                 checkBoxStrict.Visible = rt == RobustnessType.alternative_k;
-                checkBoxSmart.Visible = rt == RobustnessType.alternative_k;
             }
             else
             {
                 groupBoxSolver.Text = "Řešič pro nalezení plánu";
                 checkBoxStrict.Visible = false;
-                checkBoxSmart.Visible = false;
             }
         }
 
@@ -550,14 +548,6 @@ namespace MAPFsimulator
         private void ExecuteSolutionWithDelay()
         {
             var delay = (double)numericUpDown3.Value;
-            //TODO potom opravit - kdy vybirat smart agenta?
-            var oldAgents = new List<IAgent>(model.agents);
-            model.agents.Clear();
-            foreach (var agent in oldAgents)
-            {
-                model.agents.Add(AgentFactory.CreateAgent(agent.start, agent.target, agent.id, checkBoxSmart.Checked));
-            }
-            //
             abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out var result);
             scrollBarMax = abstractPositions.Max(p => p.Count - 1);
             ChangeState(State.ComputedSolution);

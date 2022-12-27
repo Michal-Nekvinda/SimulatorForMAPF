@@ -554,7 +554,6 @@ namespace MAPFsimulator
             {
                 labelSolver.Text = "Řešič pro nalezení hlavního plánu";
                 checkBoxStrict.Visible = rt == RobustnessType.alternative_k;
-                checkBoxSmart.Visible = rt == RobustnessType.alternative_k;
             }
             else
             {
