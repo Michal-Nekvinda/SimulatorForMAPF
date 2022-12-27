@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MAPFsimulator
@@ -10,6 +11,7 @@ namespace MAPFsimulator
         public int id { get; set; }
 
         protected readonly Communicator communicator;
+        const int MaxTimeInterval = 100;
 
         public SmartAgent(Vertex start, Vertex target, int id)
         {
@@ -38,7 +40,7 @@ namespace MAPFsimulator
             var minRisk = -1;
             foreach (var option in possibleOptions)
             {
-                var risk = ComputeCollisionRisk(option, plan, allAgentsPositions);
+                var risk = ComputeCollisionRisk(option, plan, time, allAgentsPositions);
                 if (minRisk == -1 || risk < minRisk)
                 {
                     minRisk = risk;
@@ -48,13 +50,30 @@ namespace MAPFsimulator
 
             return bestOption;
         }
+        public virtual void SetCurrentPosition(int vertexNumber, int time, Plan plan)
+        {
+            var planToTarget = new Dictionary<Vertex, List<int>>();
+            var currentVertexNumber = vertexNumber;
 
-        protected int ComputeCollisionRisk(int option, Plan plan,
+            AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), time);
+            while (plan.HasNextVertex(currentVertexNumber))
+            {
+                time++;
+                var nextVertex = plan.GetNext(currentVertexNumber, out int nextNumber);
+                currentVertexNumber = nextNumber;
+                AddToDictionary(planToTarget, nextVertex, time);
+            }
+
+            communicator.UpdatePosition(planToTarget);
+        }
+
+        protected int ComputeCollisionRisk(int option, Plan plan, int time,
             Dictionary<int, Dictionary<Vertex, List<int>>> allAgentsPositions)
         {
             var path = ComputePathToNextBranching(option, plan);
-            var timeToNextVisit = int.MaxValue;
-            foreach (var vertex in path)
+            var timeToNextVisit = MaxTimeInterval;
+
+            for (int i = 0; i < path.Count; i++)
             {
                 foreach (var agentId in allAgentsPositions.Keys)
                 {
@@ -63,12 +82,14 @@ namespace MAPFsimulator
                         continue;
                     }
 
-                    if (!allAgentsPositions[agentId].ContainsKey(vertex))
+                    if (!allAgentsPositions[agentId].ContainsKey(path[i]))
                     {
                         continue;
                     }
 
-                    var lastVertexVisit = ComputeNextVertexVisit(option, allAgentsPositions[agentId][vertex]);
+                    //spocitam, jaky je nejmensi casovy rozdil kdy na ceste kterou pocitam prijede dalsi agent
+                    // -> je-li rozdil k, potom pri zpozdeni k dojde ke kolizi
+                    var lastVertexVisit = ComputeNextVertexVisit(time + i + 1, allAgentsPositions[agentId][path[i]]);
                     if (lastVertexVisit < timeToNextVisit)
                     {
                         timeToNextVisit = lastVertexVisit;
@@ -76,19 +97,15 @@ namespace MAPFsimulator
                 }
             }
 
-            return timeToNextVisit;
+            //risk v hodnote od 0 do 100 -> 0 = (temer) zadny, 100 = nejvyssi
+            return Math.Max(MaxTimeInterval - timeToNextVisit, 0);
         }
 
-        private int ComputeNextVertexVisit(int timeInVertex, IList<int> timesOfOtherAgents)
+        private int ComputeNextVertexVisit(int timeInVertex, IList<int> timesOfOtherAgent)
         {
-            if (timesOfOtherAgents.Max() < timeInVertex)
-            {
-                return int.MaxValue;
-            }
+            var diff = timesOfOtherAgent.Select(t => Math.Abs(t - timeInVertex));
 
-            var diff = timesOfOtherAgents.Select(t => t - timeInVertex);
-
-            return diff.Where(x => x >= 0).Min();
+            return diff.Min();
         }
 
         private List<Vertex> ComputePathToNextBranching(int vertexNumber, Plan plan)
@@ -105,23 +122,7 @@ namespace MAPFsimulator
 
             return vertices;
         }
-
-        public virtual void SetCurrentPosition(int vertexNumber, int time, Plan plan)
-        {
-            var planToTarget = new Dictionary<Vertex, List<int>>();
-            var currentVertexNumber = vertexNumber;
-
-            AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), currentVertexNumber);
-            while (plan.HasNextVertex(currentVertexNumber))
-            {
-                plan.GetNext(currentVertexNumber, out int nextNumber);
-                currentVertexNumber = nextNumber;
-                AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), currentVertexNumber);
-            }
-
-            communicator.UpdatePosition(planToTarget);
-        }
-
+        
         private void AddToDictionary(IDictionary<Vertex, List<int>> dict, Vertex key, int value)
         {
             if (dict.ContainsKey(key))
@@ -146,50 +147,38 @@ namespace MAPFsimulator
             _collisionPolicy = collisionPolicy;
             _currentState = AgentState.CAN_MOVE;
         }
-
-        List<int> FilterOptionsByPolicy(int time, IList<int> possibleOptions, Plan plan)
-        {
-            var filteredOptions = new List<int>();
-            foreach (var option in possibleOptions)
-            {
-                var v = plan.GetNth(option);
-                if (_collisionPolicy.GetVertexState(v, time) == VertexState.FREE)
-                {
-                    filteredOptions.Add(option);
-                }
-            }
-
-            return filteredOptions;
-        }
-
+        
         public override int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
         {
-            var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
-            if (_collisionPolicy.MapfSolutionState != MapfSolutionState.DEADLOCK)
+            if (!plan.HasNextVertex(vertexNumber))
             {
-                possibleOptions = FilterOptionsByPolicy(time, possibleOptions, plan);
+                _currentState = AgentState.MUST_STAY;
+                return vertexNumber;   
             }
 
+            var filteredOptionsByPolicy =
+                _collisionPolicy.FilterOptions(plan, time, plan.GetPossibleOptionsFromVertex(vertexNumber));
+
             //kvuli policy se nemohu posunout do zadneho z vrcholu dle planu
-            if (possibleOptions.Count == 0)
+            if (filteredOptionsByPolicy.Count == 0)
             {
                 _currentState = AgentState.MUST_STAY;
                 return vertexNumber;
             }
 
             _currentState = AgentState.CAN_MOVE;
-            if (possibleOptions.Count == 1)
+            if (filteredOptionsByPolicy.Count == 1)
             {
                 //v tomto kroku neni mozne vybrat jiny vrchol
-                return possibleOptions[0];
+                return filteredOptionsByPolicy[0];
             }
-
+            
             var allAgentsPositions = communicator.GetAllAgentsPredictedPositions();
             var bestOption = -1;
             var minRisk = -1;
-            foreach (var option in possibleOptions)
+            foreach (var option in filteredOptionsByPolicy)
             {
-                var risk = ComputeCollisionRisk(option, plan, allAgentsPositions);
+                var risk = ComputeCollisionRisk(option, plan, time, allAgentsPositions);
                 if (minRisk == -1 || risk < minRisk)
                 {
                     minRisk = risk;
@@ -203,8 +192,7 @@ namespace MAPFsimulator
         public override void SetCurrentPosition(int vertexNumber, int time, Plan plan)
         {
             base.SetCurrentPosition(vertexNumber, time, plan);
-            var possibleNextMoves = plan.GetPossibleOptionsFromVertex(vertexNumber);
-            foreach (var move in possibleNextMoves)
+            foreach (var move in plan.GetPossibleOptionsFromVertex(vertexNumber))
             {
                 _collisionPolicy.SendRequest(plan.GetNth(move), time + 1);
             }

@@ -1,4 +1,6 @@
-﻿namespace MAPFsimulator
+﻿using System.Collections.Generic;
+
+namespace MAPFsimulator
 {
     public enum MapfSolutionState
     {
@@ -23,8 +25,7 @@
     /// </summary>
     public interface ICollisionPolicy
     {
-        VertexState GetVertexState(Vertex vertex, int time);
-        MapfSolutionState MapfSolutionState { get; }
+        IList<int> FilterOptions(Plan plan, int time, IList<int> possibleOptions);
         void SendState(AgentState state);
         void SendRequest(Vertex vertex, int time);
     }
@@ -37,10 +38,28 @@
         {
             _agentId = agentId;
         }
-
-        public MapfSolutionState MapfSolutionState => AgentsPositionProvider.GetMapfSolutionState();
-
-        public VertexState GetVertexState(Vertex vertex, int time)
+        
+        public IList<int> FilterOptions(Plan plan, int time, IList<int> possibleOptions)
+        {
+            if (AgentsPositionProvider.GetMapfSolutionState() == MapfSolutionState.DEADLOCK)
+            {
+                return possibleOptions;
+            }
+            
+            var filteredOptions = new List<int>();
+            foreach (var option in possibleOptions)
+            {
+                var v = plan.GetNth(option);
+                if (GetVertexState(v, time) == VertexState.FREE)
+                {
+                    filteredOptions.Add(option);
+                }
+            }
+            
+            return filteredOptions;
+        }
+        
+        private VertexState GetVertexState(Vertex vertex, int time)
         {
             return AgentsPositionProvider.GetVertexState(vertex, time, _agentId);
         }

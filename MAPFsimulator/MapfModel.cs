@@ -253,7 +253,7 @@ namespace MAPFsimulator
             if (robustnessType == RobustnessType.semi_k || robustnessType == RobustnessType.alternative_k)
             {
                 WaitAddingRobustness war = new WaitAddingRobustness(solution);
-                //solution = war.GetRobustPlan(rob1);
+                solution = war.GetRobustPlan(rob1);
             }
 
             //pridani alternativnich planu
