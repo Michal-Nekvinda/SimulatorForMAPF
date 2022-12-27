@@ -6,7 +6,7 @@
         {
             if (isSmart)
             {
-                return new SmartAgent(start, target, id);
+                return new SmartAgent(start, target, id, new CollisionPolicy(id));
             }
             
             return new Agent(start, target, id);

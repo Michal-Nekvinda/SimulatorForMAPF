@@ -4,6 +4,18 @@ using System.Linq;
 
 namespace MAPFsimulator
 {
+    public enum MapfSolutionState
+    {
+        Ok = 0,
+        Deadlock = 1,
+    }
+    
+    public enum VertexState
+    {
+        Free = 0,
+        Blocked = 1,
+    }
+    
     public static class AgentsPositionProvider
     {
         private static Dictionary<int, Dictionary<Vertex, List<int>>> _predictedPositions;
@@ -25,31 +37,31 @@ namespace MAPFsimulator
         public static MapfSolutionState GetMapfSolutionState()
         {
             if (_agentStates.Count == 0)
-                return MapfSolutionState.OK;
+                return MapfSolutionState.Ok;
 
-            return _agentStates.Any(x => x.Value == AgentState.CAN_MOVE)
-                ? MapfSolutionState.OK
-                : MapfSolutionState.DEADLOCK;
+            return _agentStates.Any(x => x.Value == AgentState.CanMove)
+                ? MapfSolutionState.Ok
+                : MapfSolutionState.Deadlock;
         }
 
         public static VertexState GetVertexState(Vertex vertex, int time, int agentId)
         {
             if (!_blockedVertex.ContainsKey(vertex))
             {
-                return VertexState.FREE;
+                return VertexState.Free;
             }
 
             var blockedVerticesInTime = _blockedVertex[vertex].FindAll(tuple => tuple.Item1 == time);
             if (blockedVerticesInTime.Count == 0)
             {
-                return VertexState.FREE;
+                return VertexState.Free;
             }
 
             //vrchol je pro agenta volny, pokud si ho zablokoval a zaroven ho nema zablokovany jiny agent s nizsim id
             return blockedVerticesInTime.Contains(new Tuple<int, int>(time, agentId))
                    && !blockedVerticesInTime.Any(t => t.Item2 < agentId)
-                ? VertexState.FREE
-                : VertexState.BLOCKED;
+                ? VertexState.Free
+                : VertexState.Blocked;
         }
 
         public static void UpdateAgentPosition(int agentId, Dictionary<Vertex, List<int>> planToTarget)

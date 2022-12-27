@@ -4,21 +4,41 @@ using System.Linq;
 
 namespace MAPFsimulator
 {
+    public enum AgentState
+    {
+        CanMove = 0,
+        MustStay = 1,
+    }
+    
     class SmartAgent : IAgent
     {
         public Vertex start { get; }
         public Vertex target { get; }
         public int id { get; set; }
 
-        protected readonly Communicator communicator;
-        const int MaxTimeInterval = 100;
+        private readonly Communicator _communicator;
+        private readonly ICollisionPolicy _collisionPolicy;
+        private AgentState _currentState;
+        private const int MaxTimeInterval = 100;
 
         public SmartAgent(Vertex start, Vertex target, int id)
         {
             this.id = id;
             this.start = start;
             this.target = target;
-            communicator = new Communicator(id);
+            _communicator = new Communicator(id);
+            _currentState = AgentState.CanMove;
+            _collisionPolicy = new NoPolicy();
+        }
+        
+        public SmartAgent(Vertex start, Vertex target, int id, ICollisionPolicy collisionPolicy)
+        {
+            this.id = id;
+            this.start = start;
+            this.target = target;
+            _communicator = new Communicator(id);
+            _currentState = AgentState.CanMove;
+            _collisionPolicy = collisionPolicy;
         }
 
         public override string ToString()
@@ -28,17 +48,26 @@ namespace MAPFsimulator
 
         public virtual int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
         {
-            var possibleOptions = plan.GetPossibleOptionsFromVertex(vertexNumber);
-            if (possibleOptions.Count == 1)
+            var filteredOptionsByPolicy =
+                _collisionPolicy.FilterOptions(plan, time, plan.GetPossibleOptionsFromVertex(vertexNumber));
+            
+            if (!plan.HasNextVertex(vertexNumber) || filteredOptionsByPolicy.Count == 0)
+            {
+                _currentState = AgentState.MustStay;
+                return vertexNumber;   
+            }
+            
+            _currentState = AgentState.CanMove;
+            if (filteredOptionsByPolicy.Count == 1)
             {
                 //v tomto kroku neni mozne vybrat jiny vrchol
-                return possibleOptions[0];
+                return filteredOptionsByPolicy[0];
             }
 
-            var allAgentsPositions = communicator.GetAllAgentsPredictedPositions();
+            var allAgentsPositions = _communicator.GetAllAgentsPredictedPositions();
             var bestOption = -1;
             var minRisk = -1;
-            foreach (var option in possibleOptions)
+            foreach (var option in filteredOptionsByPolicy)
             {
                 var risk = ComputeCollisionRisk(option, plan, time, allAgentsPositions);
                 if (minRisk == -1 || risk < minRisk)
@@ -64,10 +93,15 @@ namespace MAPFsimulator
                 AddToDictionary(planToTarget, nextVertex, time);
             }
 
-            communicator.UpdatePosition(planToTarget);
+            var possibleVerticesToMove =
+                plan.GetPossibleOptionsFromVertex(vertexNumber).Select(plan.GetNth).ToList();
+            
+            _communicator.UpdatePosition(planToTarget);
+            _collisionPolicy.RequestVerticesBlocking(possibleVerticesToMove, time + 1);
+            _collisionPolicy.SendAgentState(_currentState);
         }
 
-        protected int ComputeCollisionRisk(int option, Plan plan, int time,
+        private int ComputeCollisionRisk(int option, Plan plan, int time,
             Dictionary<int, Dictionary<Vertex, List<int>>> allAgentsPositions)
         {
             var path = ComputePathToNextBranching(option, plan);
@@ -133,76 +167,6 @@ namespace MAPFsimulator
             {
                 dict[key] = new List<int> { value };
             }
-        }
-    }
-
-    class SmartAgentWithPolicy : SmartAgent
-    {
-        private AgentState _currentState;
-        private ICollisionPolicy _collisionPolicy;
-
-        public SmartAgentWithPolicy(Vertex start, Vertex target, int id, ICollisionPolicy collisionPolicy) : base(start,
-            target, id)
-        {
-            _collisionPolicy = collisionPolicy;
-            _currentState = AgentState.CAN_MOVE;
-        }
-        
-        public override int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
-        {
-            if (!plan.HasNextVertex(vertexNumber))
-            {
-                _currentState = AgentState.MUST_STAY;
-                return vertexNumber;   
-            }
-
-            var filteredOptionsByPolicy =
-                _collisionPolicy.FilterOptions(plan, time, plan.GetPossibleOptionsFromVertex(vertexNumber));
-
-            //kvuli policy se nemohu posunout do zadneho z vrcholu dle planu
-            if (filteredOptionsByPolicy.Count == 0)
-            {
-                _currentState = AgentState.MUST_STAY;
-                return vertexNumber;
-            }
-
-            _currentState = AgentState.CAN_MOVE;
-            if (filteredOptionsByPolicy.Count == 1)
-            {
-                //v tomto kroku neni mozne vybrat jiny vrchol
-                return filteredOptionsByPolicy[0];
-            }
-            
-            var allAgentsPositions = communicator.GetAllAgentsPredictedPositions();
-            var bestOption = -1;
-            var minRisk = -1;
-            foreach (var option in filteredOptionsByPolicy)
-            {
-                var risk = ComputeCollisionRisk(option, plan, time, allAgentsPositions);
-                if (minRisk == -1 || risk < minRisk)
-                {
-                    minRisk = risk;
-                    bestOption = option;
-                }
-            }
-
-            return bestOption;
-        }
-
-        public override void SetCurrentPosition(int vertexNumber, int time, Plan plan)
-        {
-            base.SetCurrentPosition(vertexNumber, time, plan);
-            foreach (var move in plan.GetPossibleOptionsFromVertex(vertexNumber))
-            {
-                _collisionPolicy.SendRequest(plan.GetNth(move), time + 1);
-            }
-
-            _collisionPolicy.SendState(_currentState);
-        }
-
-        public override string ToString()
-        {
-            return "SmartAgent with " + nameof(_collisionPolicy) + " policy" + id + ": " + start + " --> " + target;
         }
     }
 }
