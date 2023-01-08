@@ -29,7 +29,7 @@ namespace MAPFsimulator
             _agentStates = new Dictionary<int, AgentState>();
         }
 
-        public static Dictionary<int, Dictionary<Vertex, List<int>>> GetAllAgentsPredictedPositions()
+        public static Dictionary<int, Dictionary<Vertex, List<int>>> GetAgentsPredictedPositions()
         {
             return _predictedPositions;
         }

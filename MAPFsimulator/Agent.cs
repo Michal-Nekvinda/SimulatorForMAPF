@@ -5,8 +5,8 @@
         Vertex start { get; }
         Vertex target { get; }
         int id { get; set; }
-        int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0);
-        void SetCurrentPosition(int vertexNumber, int time, Plan plan);
+        int NextVertex(int time, int vertexNumber, Plan plan, int delay = 0);
+        void UpdatePosition(int vertexNumber, int time, Plan plan);
     }
     
     /// <summary>
@@ -29,12 +29,12 @@
             return "Agent " + id + ": " + start + " --> " + target;
         }
 
-        public virtual int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
+        public int NextVertex(int time, int vertexNumber, Plan plan, int delay = 0)
         {
             plan.GetNext(vertexNumber, out var nextVertexNumber, delay);
             return nextVertexNumber;
         }
 
-        public void SetCurrentPosition(int vertexNumber, int time, Plan plan) { }
+        public void UpdatePosition(int vertexNumber, int time, Plan plan) { }
     }
 }

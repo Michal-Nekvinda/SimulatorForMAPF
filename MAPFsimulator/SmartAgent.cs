@@ -16,7 +16,7 @@ namespace MAPFsimulator
         public Vertex target { get; }
         public int id { get; set; }
 
-        private readonly Communicator _communicator;
+        private readonly ICommunicator _communicator;
         private readonly ICollisionPolicy _collisionPolicy;
         private AgentState _currentState;
         private const int MaxTimeInterval = 100;
@@ -46,7 +46,7 @@ namespace MAPFsimulator
             return "SmartAgent " + id + ": " + start + " --> " + target;
         }
 
-        public virtual int NextVertexToMove(int time, int vertexNumber, Plan plan, int delay = 0)
+        public int NextVertex(int time, int vertexNumber, Plan plan, int delay = 0)
         {
             var filteredOptionsByPolicy =
                 _collisionPolicy.FilterOptions(plan, time, plan.GetPossibleOptionsFromVertex(vertexNumber));
@@ -64,7 +64,7 @@ namespace MAPFsimulator
                 return filteredOptionsByPolicy[0];
             }
 
-            var allAgentsPositions = _communicator.GetAllAgentsPredictedPositions();
+            var allAgentsPositions = _communicator.GetAgentsPredictedPositions();
             var bestOption = -1;
             var minRisk = -1;
             foreach (var option in filteredOptionsByPolicy)
@@ -79,18 +79,19 @@ namespace MAPFsimulator
 
             return bestOption;
         }
-        public virtual void SetCurrentPosition(int vertexNumber, int time, Plan plan)
+        public virtual void UpdatePosition(int vertexNumber, int time, Plan plan)
         {
             var planToTarget = new Dictionary<Vertex, List<int>>();
             var currentVertexNumber = vertexNumber;
 
-            AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), time);
+            var currentTime = time;
+            AddToDictionary(planToTarget, plan.GetNth(currentVertexNumber), currentTime);
             while (plan.HasNextVertex(currentVertexNumber))
             {
-                time++;
+                currentTime++;
                 var nextVertex = plan.GetNext(currentVertexNumber, out int nextNumber);
                 currentVertexNumber = nextNumber;
-                AddToDictionary(planToTarget, nextVertex, time);
+                AddToDictionary(planToTarget, nextVertex, currentTime);
             }
 
             var possibleVerticesToMove =

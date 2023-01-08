@@ -21,7 +21,7 @@
         /// </summary>
         protected override double CurrentSpeed(IAgent agent, int i, Plan p, int time)
         {
-            var newVertex = agent.NextVertexToMove(time, lastVertexNumbers[i], p, currentDelays[i]);
+            var newVertex = agent.NextVertex(time, lastVertexNumbers[i], p, currentDelays[i]);
             var tmp = lastVertexNumbers[i];
             lastVertexNumbers[i] = newVertex;
             return newVertex - tmp;
@@ -32,7 +32,7 @@
         protected override bool WillDelay(IAgent agent, int i, Plan p, int t)
         {
             //pokud agent mel provest akci wait, nebo uz je na konci planu, tak vratim false, protoze se nezpozdi
-            if (p.GetNth(positionsInTime[i][t - 1]) == p.GetNth(agent.NextVertexToMove(t,
+            if (p.GetNth(positionsInTime[i][t - 1]) == p.GetNth(agent.NextVertex(t,
                     DoubleToInt.ToInt(positionsInTime[i][t - 1]), p, currentDelays[i])))
             {
                 return false;

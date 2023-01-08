@@ -113,7 +113,7 @@ namespace MAPFsimulator
                 //update pozic agentu
                 for (var i = 0; i < agentsCount; i++)
                 {
-                    agents[i].SetCurrentPosition(DoubleToInt.ToInt(positionsInTime[i][time]), time, plans[i]);
+                    agents[i].UpdatePosition(DoubleToInt.ToInt(positionsInTime[i][time]), time, plans[i]);
                 }
                 
                 time++;
@@ -145,7 +145,7 @@ namespace MAPFsimulator
         /// </summary>
         protected virtual double CurrentSpeed(IAgent agent, int i, Plan p, int time)
         {
-            var newVertex = agent.NextVertexToMove(time, DoubleToInt.ToInt(positionsInTime[i][time - 1]), p);
+            var newVertex = agent.NextVertex(time, DoubleToInt.ToInt(positionsInTime[i][time - 1]), p);
             var tmp = DoubleToInt.ToInt(positionsInTime[i][time - 1]);
             return newVertex - tmp;
         }
