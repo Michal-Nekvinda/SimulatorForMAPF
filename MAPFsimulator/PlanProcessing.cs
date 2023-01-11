@@ -86,14 +86,14 @@ namespace MAPFsimulator
             for (int i = 0; i < plans.Count; i++)
             {
                 HashSet<Vertex> hs = new HashSet<Vertex>();
-                for (int j = 0; j < plans[i].GetLenght(); j++)
+                for (int j = 0; j < plans[i].GetLength(); j++)
                 {
                     var v = plans[i].GetNth(j);
                     if (!safeIntervals.ContainsKey(v))
                     {
                         safeIntervals.Add(v, new Reservation(plans.Count, intervalLength));
                     }
-                    safeIntervals[v].AddReservation(j, i, j == plans[i].GetLenght() - 1);
+                    safeIntervals[v].AddReservation(j, i, j == plans[i].GetLength() - 1);
 
                     if (!conflictSet.ContainsKey(v))
                     {

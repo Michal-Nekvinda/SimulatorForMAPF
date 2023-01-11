@@ -49,10 +49,10 @@ namespace MAPFsimulator
             //zapis hodnot intervalu
             for (int i = 0; i < plans.Count; i++)
             {
-                max[i, plans[i].GetLenght() - 1] = makespan;
+                max[i, plans[i].GetLength() - 1] = makespan;
                 //kolik muze kazdy agent cekat v cili 
-                maxWait[i, plans[i].GetLenght() - 1] = makespan - plans[i].GetCost();
-                for (int j = 0; j < plans[i].GetLenght(); j++)
+                maxWait[i, plans[i].GetLength() - 1] = makespan - plans[i].GetCost();
+                for (int j = 0; j < plans[i].GetLength(); j++)
                 {
                     if (j > 0)
                     {
@@ -65,7 +65,7 @@ namespace MAPFsimulator
                             min[i, j] = min[i, j - 1] + 1;
                         }
 
-                        int newJ = plans[i].GetLenght() - 1 - j;
+                        int newJ = plans[i].GetLength() - 1 - j;
                         if (plans[i].GetNth(newJ) == plans[i].GetNth(newJ + 1))
                         {
                             max[i, newJ] = max[i, newJ + 1];
@@ -80,7 +80,7 @@ namespace MAPFsimulator
 
             for (int i = 0; i < plans.Count; i++)
             {
-                for (int j = 0; j < plans[i].GetLenght(); j++)
+                for (int j = 0; j < plans[i].GetLength(); j++)
                 {
                     //doba o kterou je mozne se zpozdit ve vrcholu - bezpecny interval
                     int safeInt = safeIntervals[plans[i].GetNth(j)].GetSafeInt(i, j);
@@ -94,7 +94,7 @@ namespace MAPFsimulator
                 }
 
                 //probublani spravnych hodnot
-                for (int j = plans[i].GetLenght() - 2; j >= 0; j--)
+                for (int j = plans[i].GetLength() - 2; j >= 0; j--)
                 {
                     if (waitInCurrentPlan[i, j] > 0)
                     {
@@ -105,7 +105,7 @@ namespace MAPFsimulator
             //uprava wait intervalu
             for (int i = 0; i < plans.Count; i++)
             {
-                for (int j = plans[i].GetLenght()-2; j >= 0; j--)
+                for (int j = plans[i].GetLength()-2; j >= 0; j--)
                 {
                     //lze cekat maximalne tolik, kolik sam muzu, nebo kolik muze muj nasledovnik, protoze to zpozdeni se prenese i na nej
                     maxWait[i, j] = Math.Min(maxWait[i, j], maxWait[i, j + 1]);
@@ -128,7 +128,7 @@ namespace MAPFsimulator
                     int howMany = Math.Min(maxWait[agentForMove, timeThisAgent-1], robustness);
                     howMany = Math.Min(howMany, maxWait[agentForMove, timeThisAgent + 1]);
                     //navyseni si lze poznamenat pouze u nasledujiciho vrcholu a cyklus provest az po zpracovani vsech prvku (z hlediska slozitosti)
-                    for (int i = timeThisAgent-1; i < plans[agentForMove].GetLenght(); i++)
+                    for (int i = timeThisAgent-1; i < plans[agentForMove].GetLength(); i++)
                     {
                         if (repairs[agentForMove, i] < howMany)
                         {
@@ -144,7 +144,7 @@ namespace MAPFsimulator
             {
                 Plan p = new Plan();
                 int addExtra = 0;
-                for (int j = 0; j < plans[i].GetLenght(); j++)
+                for (int j = 0; j < plans[i].GetLength(); j++)
                 {
                     int rep = j > 0 ? repairs[i, j - 1] : 0;
                     if (repairs[i, j] - rep > 0)
@@ -158,7 +158,7 @@ namespace MAPFsimulator
                     }
                     //pokud nasledujeme dva stejne vrcholy za sebou a byly jiz drive vycpany nejakymi wait akcemi,
                     //tak pridame tento vrchol jen jednou a usetrime jednu jednotku casu 
-                    if (j < plans[i].GetLenght()-1 && plans[i].GetNth(j) == plans[i].GetNth(j + 1) && addExtra > 0)
+                    if (j < plans[i].GetLength()-1 && plans[i].GetNth(j) == plans[i].GetNth(j + 1) && addExtra > 0)
                     {
                         addExtra--;
                     }

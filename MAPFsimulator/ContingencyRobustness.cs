@@ -36,7 +36,7 @@ namespace MAPFsimulator
         /// <param name="agents">agenti</param>
         /// <param name="minSafeMain"> bezpecny interval mezi dvema hlavnimi plany </param>
         /// <returns>Plan splnujici podminky robustnosti, nebo null, pokud takovy neexistuje.</returns>
-        public virtual List<ContingencyPlan> GetRobustPlan(List<Plan> mainPlan, Graph g, List<Agent> agents, int minSafeMain)
+        public virtual List<ContingencyPlan> GetRobustPlan(List<Plan> mainPlan, Graph g, List<IAgent> agents, int minSafeMain)
         {
             if (mainPlan==null)
             {
@@ -57,7 +57,7 @@ namespace MAPFsimulator
 
             //pro hledani pouzivame upraveny A* algoritmus
             AStarForContingencyPlan astar = new AStarForContingencyPlan(safeIntervals, secondaryMain, mainSecondary);
-            List<Agent> newAgents = new List<Agent>();
+            var newAgents = new List<IAgent>();
             var startTimes = new List<int>();
             var vertexOrder = new List<int>();
             foreach (var safeVio in Bset)
@@ -75,7 +75,7 @@ namespace MAPFsimulator
                         //mame fiktivniho agenta, ktery shani cestu z vrcholu, ktery jsme zvolili (cil ma stejny)
                         //cesta se zacne hledat od casu: 
                             //order [to je naplanovany cas prijezdu do vetviciho vrcholu] + duration [to je delka bezpecneho intervalu, tedy takove zpozdeni mi u agenta jeste nevadi a proto nepotrebujeme jit alternativou] + 1
-                        var fakeAgent = new Agent(v, agents[safeVio.agentID].target, safeVio.agentID);
+                        var fakeAgent = AgentFactory.CreateAgent(v, agents[safeVio.agentID].target, safeVio.agentID, false);
                         newAgents.Add(fakeAgent);
                         startTimes.Add(order + i);
                         vertexOrder.Add(order);
@@ -157,9 +157,9 @@ namespace MAPFsimulator
         /// Odstrani duplicity v hledani alternativnich cest - vzhledem ke hledani pocatecniho vrcholu alternativniho planu u
         /// alternativni k-robustnosti se muze stat, ze dve alternativy splynou do jedne - tim si usetrime duplicitni hledani te same cesty.
         /// </summary>
-        private List<Agent> ReduceAgents(List<Agent> agents, List<int> initialTimes, List<int> vertexOrder)
+        private List<IAgent> ReduceAgents(IList<IAgent> agents, IList<int> initialTimes, IList<int> vertexOrder)
         {
-            List<Agent> reduced = new List<Agent>();
+            var reduced = new List<IAgent>();
             for (int i = 0; i < agents.Count; i++)
             {
                 bool add = true;
@@ -199,7 +199,7 @@ namespace MAPFsimulator
         /// <param name="agents">agenti</param>
         /// <param name="minSafeMain"> bezpecny interval mezi dvema hlavnimi plany </param>
         /// <returns>Plan splnujici podminky robustnosti, nebo null, pokud takovy neexistuje.</returns>
-        public override List<ContingencyPlan> GetRobustPlan(List<Plan> mainPlan, Graph g, List<Agent> agents, int minSafeMain)
+        public override List<ContingencyPlan> GetRobustPlan(List<Plan> mainPlan, Graph g, List<IAgent> agents, int minSafeMain)
         {
             return base.GetRobustPlan(mainPlan, g, agents, minSafeMain);
         }
@@ -232,7 +232,7 @@ namespace MAPFsimulator
         /// <param name="agents">agenti</param>
         /// <param name="minSafeMain"> bezpecny interval mezi dvema hlavnimi plany </param>
         /// <returns>Plan splnujici podminky robustnosti, nebo null, pokud takovy neexistuje.</returns>
-        public override List<ContingencyPlan> GetRobustPlan(List<Plan> mainPlan, Graph g, List<Agent> agents, int minSafeMain)
+        public override List<ContingencyPlan> GetRobustPlan(List<Plan> mainPlan, Graph g, List<IAgent> agents, int minSafeMain)
         {
             return base.GetRobustPlan(mainPlan, g, agents, minSafeMain);
         }

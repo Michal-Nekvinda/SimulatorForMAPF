@@ -265,7 +265,10 @@ namespace MAPFsimulator
                         var numbers = mainForm.GetShuffleList(agentsPositions.Count, IntGenerator.GetInstance(), (repetitions > 1 || wholeTestRepetitions > 1));
                         for (int l = 0; l < min + i; l++)
                         {
-                            Agent a = new Agent(agentsPositions[numbers[l]][0], agentsPositions[numbers[l]][1], agentsPositions[numbers[l]][2], agentsPositions[numbers[l]][3], l);
+                            var a = AgentFactory.CreateAgent(
+                                new Vertex(agentsPositions[numbers[l]][0], agentsPositions[numbers[l]][1]),
+                                new Vertex(agentsPositions[numbers[l]][2], agentsPositions[numbers[l]][3]), l,
+                                checkBoxSmart.Checked);
                             model.LoadAgent(a);
                         }
                         int solLen = 0;
@@ -360,7 +363,8 @@ namespace MAPFsimulator
             //konec vsech testu
 
             Array.Sort(solvedInstances);
-            textBoxLog.AppendText("Medián vyřešených instancí v časovém limitu testu: "+ solvedInstances[(wholeTestRepetitions-1)/2].ToString()+"\n");
+            textBoxLog.AppendText("Medián vyřešených instancí v časovém limitu testu: "+ solvedInstances[(wholeTestRepetitions-1)/2]);
+            textBoxLog.AppendText(Environment.NewLine);
             //vysledek pripravim do schranky pro kopirovani a vypisu do logu
             ResultsToClipboard();
             buttonBenchmarkRun.Enabled = true;
@@ -554,6 +558,7 @@ namespace MAPFsimulator
             else
             {
                 labelSolver.Text = "Řešič pro nalezení plánu";
+                checkBoxStrict.Visible = false;
                 checkBoxStrict.Visible = false;
             }
         }

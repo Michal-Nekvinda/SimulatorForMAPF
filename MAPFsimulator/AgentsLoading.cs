@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -33,6 +26,11 @@ namespace MAPFsimulator
         public bool confirmed;
 
         /// <summary>
+        /// zda jsme vybrali smart agenty
+        /// </summary>
+        public bool smartAgents;
+
+        /// <summary>
         /// Vytvori nove okno s moznosti vyberu poctu agentu do grafu.
         /// </summary>
         public AgentsLoading()
@@ -40,7 +38,7 @@ namespace MAPFsimulator
             InitializeComponent();
             confirmed = false;
         }
-
+        
         /// <summary>
         /// Zobrazi pocet nalezenych agentu. 
         /// </summary>
@@ -58,6 +56,7 @@ namespace MAPFsimulator
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
             randomChoice = checkBoxRandom.Checked;
+            smartAgents = checkBoxSmart.Checked;
             if (int.TryParse(textBox1.Text, out n) && n <= int.Parse(labelAgentsCount.Text))
             {
                 confirmed = true;

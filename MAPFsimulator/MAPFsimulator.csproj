@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="AgentFactory.cs" />
     <Compile Include="AgentsLoading.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,15 +77,21 @@
     </Compile>
     <Compile Include="Astar.cs" />
     <Compile Include="CBSsolver.cs" />
+    <Compile Include="Communicator.cs" />
+    <Compile Include="Condition.cs" />
     <Compile Include="Conflict.cs" />
     <Compile Include="Constraint.cs" />
+    <Compile Include="ContingencyExecution.cs" />
     <Compile Include="ContingencyRobustness.cs" />
     <Compile Include="CostFunction.cs" />
     <Compile Include="DoubleToInt.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Generator.cs" />
+    <Compile Include="Min_MaxRobustExecution.cs" />
     <Compile Include="PicatSolving.cs" />
     <Compile Include="PlanProcessing.cs" />
+    <Compile Include="AgentsPositionProvider.cs" />
+    <Compile Include="MapfColisionPolicy.cs" />
     <Compile Include="SafeSpace.cs" />
     <Compile Include="SetOfColors.cs" />
     <Compile Include="Settings.cs">
@@ -93,6 +100,7 @@
     <Compile Include="Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="SmartAgent.cs" />
     <Compile Include="WaitAddingRobustness.cs" />
     <Compile Include="PlanTable.cs">
       <SubType>Form</SubType>
@@ -101,7 +109,7 @@
       <DependentUpon>PlanTable.cs</DependentUpon>
     </Compile>
     <Compile Include="Reservation.cs" />
-    <Compile Include="Execution.cs" />
+    <Compile Include="SimpleExecution.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

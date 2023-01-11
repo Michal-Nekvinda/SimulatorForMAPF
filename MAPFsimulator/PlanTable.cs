@@ -23,7 +23,7 @@ namespace MAPFsimulator
             this.WindowState = FormWindowState.Maximized;
         }
 
-        private int getMaxLenght(List<double>[] array)
+        private int getMaxLength(List<double>[] array)
         {
             return array.Max(l => l.Count);
         }
@@ -42,10 +42,10 @@ namespace MAPFsimulator
             PictureBox pictureBox1 = new PictureBox();
             this.Controls.Add(pictureBox1);
             int agents = plans.Count;
-            int lenght = getMaxLenght(vertices);
+            int length = getMaxLength(vertices);
             Font drawFont = new Font(this.Font.FontFamily, 8);
 
-            pictureBox1.Size = new Size(lenght * cellW + margin, agents * cellH + margin);
+            pictureBox1.Size = new Size(length * cellW + margin, agents * cellH + margin);
             Bitmap planDrawing = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics g = Graphics.FromImage(planDrawing);
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
@@ -54,7 +54,7 @@ namespace MAPFsimulator
             List<Vertex> current = new List<Vertex>();
             List<double> edgePart = new List<double>();
             //pro vsechny casy
-            for (int i = 0; i < lenght; i++)
+            for (int i = 0; i < length; i++)
             {
                 last = current;
                 current = new List<Vertex>();

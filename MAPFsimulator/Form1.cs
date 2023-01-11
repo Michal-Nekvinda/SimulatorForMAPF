@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -350,7 +349,7 @@ namespace MAPFsimulator
                         return;
                     }
                 }
-                AddAgentToModel(position);
+                AddAgentToModel(position, checkBoxSmart.Checked);
                 ChangeState(State.AgentLoaded);
 
             }
@@ -358,9 +357,10 @@ namespace MAPFsimulator
                 MessageBox.Show("Zadejte pozici agenta ve formatu startX, startY, cilX, cilY", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void AddAgentToModel(int[] position)
+        private void AddAgentToModel(int[] position, bool isSmart)
         {
-            Agent a = new Agent(position[0], position[1], position[2], position[3], listBoxAgenti.Items.Count);
+            var a = AgentFactory.CreateAgent(new Vertex(position[0], position[1]), new Vertex(position[2], position[3]),
+                listBoxAgenti.Items.Count, isSmart);
             if (model.LoadAndCheck(a))
             {
                 listBoxAgenti.Items.Add(a.ToString());
@@ -368,7 +368,7 @@ namespace MAPFsimulator
             }
             else
             {
-                MessageBox.Show(a.ToString()+" nelze vložit, protože jeho startovní nebo cílový vrchol je již obsazen jiným agentem.","Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(a +" nelze vložit, protože jeho startovní nebo cílový vrchol je již obsazen jiným agentem.","Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -438,7 +438,7 @@ namespace MAPFsimulator
                                 var shuffleIndexes = GetShuffleList(agents.Count, IntGenerator.GetInstance(), al.randomChoice);
                                 for (int i = 0; i < al.n; i++)
                                 {
-                                    AddAgentToModel(agents[shuffleIndexes[i]]);
+                                    AddAgentToModel(agents[shuffleIndexes[i]], al.smartAgents);
                                 }
                                 if (model.agents.Count > 0)
                                 {
@@ -505,7 +505,7 @@ namespace MAPFsimulator
             if (rt == RobustnessType.semi_k || rt == RobustnessType.alternative_k)
             {
                 groupBoxSolver.Text = "Řešič pro nalezení hlavního plánu";
-                checkBoxStrict.Visible = rt==RobustnessType.alternative_k;               
+                checkBoxStrict.Visible = rt == RobustnessType.alternative_k;
             }
             else
             {
@@ -538,25 +538,24 @@ namespace MAPFsimulator
             }
             else
             {
-                NextExecution();
+                ExecuteSolutionWithDelay();
             }
         }
         /// <summary>
-        /// Provede exekuci nalezeno reseni.
+        /// Provede exekuci nalezeneho reseni.
         /// </summary>
-        private void NextExecution()
+        private void ExecuteSolutionWithDelay()
         {
-            string result;
-            double delay = (double)numericUpDown3.Value;
-            abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out result);
-            scrollBarMax = abstractPositions.Max(p => p.Count-1);
+            var delay = (double)numericUpDown3.Value;
+            abstractPositions = model.ExecuteSolution(delay, out makespanOfExecution, out var result);
+            scrollBarMax = abstractPositions.Max(p => p.Count - 1);
             ChangeState(State.ComputedSolution);
-            MessageBox.Show(result,"Exekuce ukončena",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            MessageBox.Show(result, "Exekuce ukončena", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void buttonNextExec_Click(object sender, EventArgs e)
         {
-            NextExecution();
+            ExecuteSolutionWithDelay();
         }
 
         /// <summary>
@@ -710,7 +709,8 @@ namespace MAPFsimulator
             //nacteni agentu
             for (int i = 0; i < plans.Count; i++)
             {
-                Agent a = new Agent(plans[i].GetNth(0), plans[i].GetNth(plans[i].GetLenght() - 1), i);
+                var a = AgentFactory.CreateAgent(plans[i].GetNth(0), plans[i].GetNth(plans[i].GetLength() - 1), i,
+                    checkBoxSmart.Checked);
                 model.LoadAgent(a);
                 listBoxAgenti.Items.Add(a.ToString());
             }

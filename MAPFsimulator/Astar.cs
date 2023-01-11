@@ -20,7 +20,7 @@ namespace MAPFsimulator
         /// Jako heuristicka funkce je pouzita vzdalenost vrcholu v metrice Manhattan.
         /// </summary>
         /// <returns>Plan obsahujici nejkratsi cestu.</returns>
-        public Plan SearchPath(Agent a, Graph g, int minL, HashSet<Constraint> c, int startTime, int maxDepth)
+        public Plan SearchPath(IAgent a, Graph g, int minL, HashSet<Constraint> c, int startTime, int maxDepth)
         {
             //pokud jsou vrcholy startu ci cile nepristupne v grafu g, cesta neexistuje
             if (!g.IsVertex(a.start.x, a.start.y) || !g.IsVertex(a.target.x, a.target.y))

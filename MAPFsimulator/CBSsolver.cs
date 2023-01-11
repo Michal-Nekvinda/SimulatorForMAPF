@@ -40,7 +40,7 @@ namespace MAPFsimulator
             {
                 return null;
             }
-            int maxSteps = paths.Max(p => p.GetLenght());
+            int maxSteps = paths.Max(p => p.GetLength());
             //pro vsechny timestepy
             for (int i = 0; i < maxSteps; i++)
             {
@@ -69,13 +69,13 @@ namespace MAPFsimulator
         /// </summary>
         protected virtual int MinimalPathLength(Plan p, Conflict c, int id)
         {
-            if (p.GetLenght() <= c.time + c.duration)
+            if (p.GetLength() <= c.time + c.duration)
             {
                 //jeho plan se tedy musi prodlouzit tak, aby skoncil nejdrive v case konfliktu + 1
                 return c.time + c.duration + 1;
             }
             else
-                return p.GetLenght();
+                return p.GetLength();
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace MAPFsimulator
         /// Vraci validni plan pro skupinu agentu agents v grafu g.
         /// Pokud plan neexistuje, nebo dojde-li k vyprseni casoveho limitu, vraci null.
         /// </summary>
-        public List<Plan> GetPlan(Graph g, List<Agent> agents)
+        public List<Plan> GetPlan(Graph g, List<IAgent> agents)
         {
             //cas
             sw.Restart();
@@ -251,7 +251,7 @@ namespace MAPFsimulator
         protected override Conflict Validate(List<Plan> paths)
         {
             //najdeme nejdelsi cestu
-            int steps = paths.Max(p => p.GetLenght());
+            int steps = paths.Max(p => p.GetLength());
             //postupujeme od zacatku smerem do konce --> najdeme nejblizsi konflikt od pocatku
             for (int k = 0; k < steps; k++)
             {
@@ -260,8 +260,8 @@ namespace MAPFsimulator
                     for (int j = i + 1; j < paths.Count; j++)
                     {
                         //zkontrolujeme konflikt u dane dvojice i,j v case k
-                        int maxL = Math.Max(paths[i].GetLenght(), paths[j].GetLenght());
-                        int minL = Math.Min(paths[i].GetLenght(), paths[j].GetLenght());
+                        int maxL = Math.Max(paths[i].GetLength(), paths[j].GetLength());
+                        int minL = Math.Min(paths[i].GetLength(), paths[j].GetLength());
                         //pokud zkoumame cas, kdy uz jsou oba v cili, pak konflikt mit nebudou --> kontrolujeme jen pro k < maxL
                         if (k < maxL)
                         {
@@ -305,8 +305,8 @@ namespace MAPFsimulator
         /// </summary>
         private Conflict CheckConflict2(Plan p1, Plan p2, int id1, int id2, int time)
         {
-            int maxL = Math.Max(p1.GetLenght(), p2.GetLenght());
-            int minL = Math.Min(p1.GetLenght(), p2.GetLenght());
+            int maxL = Math.Max(p1.GetLength(), p2.GetLength());
+            int minL = Math.Min(p1.GetLength(), p2.GetLength());
             //kontrolujeme pouze pokud agenti jeste nejsou v case time v cili
             if (time < maxL)
             {
@@ -345,7 +345,7 @@ namespace MAPFsimulator
         /// <returns>Konflikt, ktery nastal nejdrive, nebo null, pokud je plan validni.</returns>
         protected override Conflict Validate(List<Plan> paths)
         {
-            int steps = paths.Max(p => p.GetLenght());
+            int steps = paths.Max(p => p.GetLength());
             for (int l = 0; l < steps; l++)
             {
                 for (int i = 0; i < paths.Count; i++)
@@ -387,11 +387,11 @@ namespace MAPFsimulator
         /// </summary>
         protected override int MinimalPathLength(Plan p, Conflict c, int id)
         {
-            if (initialTimes[id] + p.GetLenght() <= c.time)
+            if (initialTimes[id] + p.GetLength() <= c.time)
             {
                 return c.time + 1;
             }
-            else return initialTimes[id] + p.GetLenght();
+            else return initialTimes[id] + p.GetLength();
         }
 
         /// <summary>
@@ -415,7 +415,7 @@ namespace MAPFsimulator
                             continue;
                         }
                         int from = Math.Max(initialTimes[i], initialTimes[j]);
-                        int to = Math.Max(initialTimes[i] + paths[i].GetLenght(), initialTimes[j] + paths[j].GetLenght());
+                        int to = Math.Max(initialTimes[i] + paths[i].GetLength(), initialTimes[j] + paths[j].GetLength());
                         if (t >= from && t < to)
                         {
                             if (paths[i].GetNth(t - initialTimes[i]) == paths[j].GetNth(t - initialTimes[j]))

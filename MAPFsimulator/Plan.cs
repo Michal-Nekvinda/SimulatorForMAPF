@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MAPFsimulator
 {
@@ -7,9 +8,11 @@ namespace MAPFsimulator
     /// Datova struktura uchovavajici plan agenta v MAPF problemu.
     /// Plan je List vrcholu (struktura Vertex).
     /// </summary>
-    class Plan
+    public class Plan
     {
-        //List vrcholu reprezentujici plan
+        /// <summary>
+        /// List vrcholu reprezentujici plan
+        /// </summary>
         protected List<Vertex> path;
         public static string delimiter = "-->";
         /// <summary>
@@ -78,7 +81,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Vraci pocet vrcholu planu.
         /// </summary>
-        public virtual int GetLenght()
+        public virtual int GetLength()
         {
             return path.Count;
         }
@@ -140,6 +143,17 @@ namespace MAPFsimulator
         }
 
         /// <summary>
+        /// Vraci seznam poradovych cisel vrcholu, do kterych se muze agent z vrcholu s cislem vertexNumber presunout
+        /// </summary>
+        /// <param name="vertexNumber"></param>
+        /// <returns></returns>
+        public virtual IList<int> GetPossibleOptionsFromVertex(int vertexNumber)
+        {
+            GetNext(vertexNumber, out var nextVertexNumber);
+            return new List<int> { nextVertexNumber };
+        }
+
+        /// <summary>
         /// Vraci true, pokud je vrchol, ktery je vracen po zavolani metody GetNth(i), soucasti hlavniho planu.
         /// </summary>
         public virtual bool IsInMainPlan(int i)
@@ -168,23 +182,6 @@ namespace MAPFsimulator
 
 
     /// <summary>
-    /// Podminka na vybrani alternativniho planu.
-    /// Pouziti: z vrcholu x lze jit do vrcholu s poradovym cislem successor, pokud je zpozdeni v intervalu [min, max].
-    /// </summary>
-    struct Condition
-    {
-        public int delayMin;
-        public int delayMax;
-        public int successor;
-        public Condition(int min, int max)
-        {
-            this.delayMin = min;
-            this.delayMax = max;
-            successor = -1;           
-        }
-    }
-
-    /// <summary>
     /// Plan s alternativami - trida rozsirujici puvodni sekvenci plan na plan se stromovou strukturou.
     /// Vyuziva ho alternatvni a semi k-robustnost.
     /// </summary>
@@ -195,16 +192,9 @@ namespace MAPFsimulator
         private int maxBranches = 1;
         private int mainLength;
         //pomocna tabulka pro korektni vypis planu v metode ToString()
-        private Dictionary<int, int> successors;
-        /// <summary>
-        /// Vytvori prazdny plan.
-        /// </summary>
-        public ContingencyPlan()
-        {
-            path = new List<Vertex>();
-            transitionTable = new Dictionary<int, List<Condition>>();
-            successors = new Dictionary<int, int>();
-        }
+        // -> tabulka predku pro takove vrcholy s poradovym cislem v, jejichz predkem neni vrchol s cislem v-1
+        private Dictionary<int, int> ancestors;
+
         /// <summary>
         /// Vytvori novy plan s alternativami a jako hlavni plan vezme list vrcholu mainPlan.
         /// </summary>
@@ -213,7 +203,7 @@ namespace MAPFsimulator
             path = new List<Vertex>();
             transitionTable = new Dictionary<int, List<Condition>>();
             AddMainPlan(mainPlan);
-            successors = new Dictionary<int, int>();
+            ancestors = new Dictionary<int, int>();
         }
         /// <summary>
         /// Vraci true, pokud je cislo i poradove cislo vrcholu, ktery patri do hlavniho planu.
@@ -244,7 +234,7 @@ namespace MAPFsimulator
         /// <summary>
         /// Vraci pocet vrcholu hlavniho planu.
         /// </summary>
-        public override int GetLenght()
+        public override int GetLength()
         {
             return mainLength;
         }
@@ -278,7 +268,14 @@ namespace MAPFsimulator
                 }
                 return path[conditions[0].successor];
             }
+        }
 
+        public override IList<int> GetPossibleOptionsFromVertex(int vertexNumber)
+        {
+            //podivame se, kam muzeme z vrcholu cislo vertexNumber prejit
+            var conditions = transitionTable[vertexNumber];
+
+            return conditions.Select(condition => condition.successor).ToList();
         }
 
         /// <summary>
@@ -316,7 +313,7 @@ namespace MAPFsimulator
             path.AddRange(plan);
             //do prechodove tabulky predame informaci, ze se jedna o alternativu
             transitionTable[from].Add(c);
-            successors.Add(vertices, from);
+            ancestors.Add(vertices, from);
             if (transitionTable[from].Count > maxBranches)
             {
                 maxBranches = transitionTable[from].Count;
@@ -344,15 +341,19 @@ namespace MAPFsimulator
             else
             {
                 string p = "";
+                //prochazim vsechny vrcholy cesty
                 for (int i = 0; i < path.Count; i++)
                 {
+                    //pridam vrchol do vypisu
                     p += path[i].ToString();
+                    //pokud neni posledni, tak budu dal navazovat
                     if (i != path.Count - 1)
-                    {
+                    { 
+                        //pokud je vrchol sam sobe naslednikem, tak je na konci cesty a dalsi vrchol bude zacatek alternativni cesty
                         if (transitionTable[i][0].successor == i)
                         {
                             //pristi vrchol bude 1. vrchol alternativni cesty
-                            p += "  | ["+successors[i+1]+"]  ";
+                            p += "  | [" + ancestors[i + 1] + "]  ";
                         }
                         else
                             p += " --> ";

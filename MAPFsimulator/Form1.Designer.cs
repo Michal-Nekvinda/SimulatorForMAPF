@@ -68,11 +68,13 @@
             this.groupBoxSolver = new System.Windows.Forms.GroupBox();
             this.radioButtonPicat = new System.Windows.Forms.RadioButton();
             this.radioButtonCBS = new System.Windows.Forms.RadioButton();
-            this.checkBoxStrict = new System.Windows.Forms.CheckBox();
             this.GroupBoxDelay = new System.Windows.Forms.GroupBox();
             this.buttonNextExec = new System.Windows.Forms.Button();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.buttonFindSol = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.checkBoxSmart = new System.Windows.Forms.CheckBox();
+            this.checkBoxStrict = new System.Windows.Forms.CheckBox();
             this.groupBoxSimulation = new System.Windows.Forms.GroupBox();
             this.radioButtonRealMake = new System.Windows.Forms.RadioButton();
             this.radioButtonPlanMake = new System.Windows.Forms.RadioButton();
@@ -96,6 +98,7 @@
             this.groupBoxSolver.SuspendLayout();
             this.GroupBoxDelay.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
+            this.panel2.SuspendLayout();
             this.groupBoxSimulation.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -272,7 +275,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(4, 32);
+            this.label5.Location = new System.Drawing.Point(4, 23);
             this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(114, 13);
@@ -281,7 +284,7 @@
             // 
             // textBoxVlozAg
             // 
-            this.textBoxVlozAg.Location = new System.Drawing.Point(7, 49);
+            this.textBoxVlozAg.Location = new System.Drawing.Point(7, 40);
             this.textBoxVlozAg.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxVlozAg.Name = "textBoxVlozAg";
             this.textBoxVlozAg.Size = new System.Drawing.Size(110, 20);
@@ -310,6 +313,7 @@
             // 
             // groupBoxAgentAdding
             // 
+            this.groupBoxAgentAdding.Controls.Add(this.checkBoxSmart);
             this.groupBoxAgentAdding.Controls.Add(this.label5);
             this.groupBoxAgentAdding.Controls.Add(this.textBoxVlozAg);
             this.groupBoxAgentAdding.Controls.Add(this.vlozAgenta);
@@ -391,9 +395,9 @@
             this.tableLayoutPanel1.Controls.Add(this.comboBoxRobustType, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.groupBox3, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.groupBoxSolver, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.checkBoxStrict, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.GroupBoxDelay, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.buttonFindSol, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.panel2, 0, 3);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(7, 17);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -531,18 +535,6 @@
             this.radioButtonCBS.Text = "CBS";
             this.radioButtonCBS.UseVisualStyleBackColor = true;
             // 
-            // checkBoxStrict
-            // 
-            this.checkBoxStrict.AutoSize = true;
-            this.checkBoxStrict.Location = new System.Drawing.Point(2, 160);
-            this.checkBoxStrict.Margin = new System.Windows.Forms.Padding(2);
-            this.checkBoxStrict.Name = "checkBoxStrict";
-            this.checkBoxStrict.Size = new System.Drawing.Size(95, 17);
-            this.checkBoxStrict.TabIndex = 3;
-            this.checkBoxStrict.Text = "striktní přístup";
-            this.checkBoxStrict.UseVisualStyleBackColor = true;
-            this.checkBoxStrict.Visible = false;
-            // 
             // GroupBoxDelay
             // 
             this.GroupBoxDelay.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -600,6 +592,39 @@
             this.buttonFindSol.Text = "Najít řešení";
             this.buttonFindSol.UseVisualStyleBackColor = true;
             this.buttonFindSol.Click += new System.EventHandler(this.buttonFindSol_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.checkBoxStrict);
+            this.panel2.Location = new System.Drawing.Point(0, 158);
+            this.panel2.Margin = new System.Windows.Forms.Padding(0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(226, 24);
+            this.panel2.TabIndex = 6;
+            // 
+            // checkBoxSmart
+            // 
+            this.checkBoxSmart.AutoSize = true;
+            this.checkBoxSmart.Location = new System.Drawing.Point(7, 64);
+            this.checkBoxSmart.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxSmart.Name = "checkBoxSmart";
+            this.checkBoxSmart.Size = new System.Drawing.Size(94, 17);
+            this.checkBoxSmart.TabIndex = 4;
+            this.checkBoxSmart.Text = "SMART agent";
+            this.checkBoxSmart.UseVisualStyleBackColor = true;
+            this.checkBoxSmart.Visible = true;
+            // 
+            // checkBoxStrict
+            // 
+            this.checkBoxStrict.AutoSize = true;
+            this.checkBoxStrict.Location = new System.Drawing.Point(2, 2);
+            this.checkBoxStrict.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxStrict.Name = "checkBoxStrict";
+            this.checkBoxStrict.Size = new System.Drawing.Size(95, 17);
+            this.checkBoxStrict.TabIndex = 3;
+            this.checkBoxStrict.Text = "striktní přístup";
+            this.checkBoxStrict.UseVisualStyleBackColor = true;
+            this.checkBoxStrict.Visible = false;
             // 
             // groupBoxSimulation
             // 
@@ -677,7 +702,7 @@
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 520F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 539F));
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.groupBoxGraphDraw, 0, 0);
             this.tableLayoutPanel2.Location = new System.Drawing.Point(1243, 24);
@@ -724,7 +749,7 @@
             // tableLayoutPanel5
             // 
             this.tableLayoutPanel5.ColumnCount = 1;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 1771F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel5.Controls.Add(this.listBox1, 0, 2);
             this.tableLayoutPanel5.Controls.Add(this.label1, 0, 1);
@@ -764,7 +789,6 @@
             this.groupBox5.PerformLayout();
             this.groupBoxSolverPicker.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
@@ -773,6 +797,8 @@
             this.groupBoxSolver.PerformLayout();
             this.GroupBoxDelay.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.groupBoxSimulation.ResumeLayout(false);
             this.groupBoxSimulation.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -837,6 +863,8 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.ToolStripMenuItem nastaveníToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.CheckBox checkBoxSmart;
     }
 }
 

@@ -147,7 +147,7 @@ namespace MAPFsimulator
                 //min/max robustnost - zde se agenti mohou nachazet mezi vrcholy
                 if (part > 0)
                 {
-                    double minPart = 1.0/model.solParameter2;
+                    double minPart = 1.0 / model.solParameter2;
                     double maxPart = 1 - minPart;
                     double currentPart = minPart;
                     if (Math.Abs(minPart-maxPart)>DoubleToInt.epsilon)
