@@ -2,8 +2,20 @@
 
 namespace MAPFsimulator
 {
+    /// <summary>
+    /// Rozhrani pro exekuci planu agentu z MAPF instance
+    /// </summary>
     interface IPlansExecutor
     {
+        /// <summary>
+        /// Provede simulaci MAPF instance 
+        /// </summary>
+        /// <param name="plans"></param>
+        /// <param name="agents"></param>
+        /// <param name="message"></param>
+        /// <param name="conf">nalezeny konflikt</param>
+        /// <param name="length">delka nasimulovaneho planu</param>
+        /// <returns></returns>
         List<double>[] ExecuteSolution(List<Plan> plans, List<IAgent> agents, out string message, out Conflict conf,
             out int length);
     }

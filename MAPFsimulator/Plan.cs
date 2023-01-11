@@ -10,7 +10,9 @@ namespace MAPFsimulator
     /// </summary>
     public class Plan
     {
-        //List vrcholu reprezentujici plan
+        /// <summary>
+        /// List vrcholu reprezentujici plan
+        /// </summary>
         protected List<Vertex> path;
         public static string delimiter = "-->";
         /// <summary>
@@ -140,6 +142,11 @@ namespace MAPFsimulator
             return this.GetNth(DoubleToInt.ToInt(d));
         }
 
+        /// <summary>
+        /// Vraci seznam poradovych cisel vrcholu, do kterych se muze agent z vrcholu s cislem vertexNumber presunout
+        /// </summary>
+        /// <param name="vertexNumber"></param>
+        /// <returns></returns>
         public virtual IList<int> GetPossibleOptionsFromVertex(int vertexNumber)
         {
             GetNext(vertexNumber, out var nextVertexNumber);

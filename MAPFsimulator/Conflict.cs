@@ -4,7 +4,7 @@
     /// Trida reprezentujici vrcholovy konflikt.
     /// Konflikt je vzdy mezi dvema agenty (agentID1 a agentID2) v urcitem case (time), vrcholu (vertex) s dobou trvani (duration).
     /// </summary>
-    public class Conflict
+    class Conflict
     {
         public int agentID1 { get; }
         public int agentID2 { get; }

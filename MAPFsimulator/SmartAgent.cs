@@ -4,12 +4,25 @@ using System.Linq;
 
 namespace MAPFsimulator
 {
+    /// <summary>
+    /// Vycet hodnot, kterych muze nabyvat interni stav agenta
+    /// </summary>
     public enum AgentState
     {
+        /// <summary>
+        /// agent ma k dispozici akci move
+        /// </summary>
         CanMove = 0,
+
+        /// <summary>
+        /// agent musi zustat stat na miste
+        /// </summary>
         MustStay = 1,
     }
-    
+
+    /// <summary>
+    /// Trida reprezentujici SMART agenta
+    /// </summary>
     class SmartAgent : IAgent
     {
         public Vertex start { get; }
@@ -30,7 +43,7 @@ namespace MAPFsimulator
             _currentState = AgentState.CanMove;
             _collisionPolicy = new NoPolicy();
         }
-        
+
         public SmartAgent(Vertex start, Vertex target, int id, ICollisionPolicy collisionPolicy)
         {
             this.id = id;
@@ -50,13 +63,13 @@ namespace MAPFsimulator
         {
             var filteredOptionsByPolicy =
                 _collisionPolicy.FilterOptions(plan, time, plan.GetPossibleOptionsFromVertex(vertexNumber));
-            
+
             if (!plan.HasNextVertex(vertexNumber) || filteredOptionsByPolicy.Count == 0)
             {
                 _currentState = AgentState.MustStay;
-                return vertexNumber;   
+                return vertexNumber;
             }
-            
+
             _currentState = AgentState.CanMove;
             if (filteredOptionsByPolicy.Count == 1)
             {
@@ -79,6 +92,7 @@ namespace MAPFsimulator
 
             return bestOption;
         }
+
         public virtual void UpdatePosition(int vertexNumber, int time, Plan plan)
         {
             var planToTarget = new Dictionary<Vertex, List<int>>();
@@ -96,7 +110,7 @@ namespace MAPFsimulator
 
             var possibleVerticesToMove =
                 plan.GetPossibleOptionsFromVertex(vertexNumber).Select(plan.GetNth).ToList();
-            
+
             _communicator.UpdatePosition(planToTarget);
             _collisionPolicy.RequestVerticesBlocking(possibleVerticesToMove, time + 1);
             _collisionPolicy.SendAgentState(_currentState);
@@ -157,7 +171,7 @@ namespace MAPFsimulator
 
             return vertices;
         }
-        
+
         private void AddToDictionary(IDictionary<Vertex, List<int>> dict, Vertex key, int value)
         {
             if (dict.ContainsKey(key))

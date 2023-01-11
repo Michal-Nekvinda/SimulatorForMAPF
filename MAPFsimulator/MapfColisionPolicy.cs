@@ -3,24 +3,51 @@
 namespace MAPFsimulator
 {
     /// <summary>
-    /// 
+    /// Rozhrani pro pravidlo pro predchazeni kolizi
     /// </summary>
     public interface ICollisionPolicy
     {
+        /// <summary>
+        /// Vrati seznam dostunych moznosti prechodu v planu v case time
+        /// </summary>
+        /// <param name="plan"></param>
+        /// <param name="time"></param>
+        /// <param name="possibleOptions"></param>
+        /// <returns></returns>
         IList<int> FilterOptions(Plan plan, int time, IList<int> possibleOptions);
+
+        /// <summary>
+        /// Odesle stav agenta
+        /// </summary>
+        /// <param name="state"></param>
         void SendAgentState(AgentState state);
+
+        /// <summary>
+        /// Zkusi zablokovat vrcholy v case time
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="time"></param>
         void RequestVerticesBlocking(IList<Vertex> vertices, int time);
     }
 
-    public class NoPolicy : ICollisionPolicy
+    /// <summary>
+    /// Implementace pro Smart agenta bez collision policy
+    /// </summary>
+    class NoPolicy : ICollisionPolicy
     {
         public IList<int> FilterOptions(Plan plan, int time, IList<int> possibleOptions)
             => possibleOptions;
-        public void SendAgentState(AgentState state) { }
-        public void RequestVerticesBlocking(IList<Vertex> vertices, int time) { }
+
+        public void SendAgentState(AgentState state)
+        {
+        }
+
+        public void RequestVerticesBlocking(IList<Vertex> vertices, int time)
+        {
+        }
     }
 
-    public class CollisionPolicy : ICollisionPolicy
+    class CollisionPolicy : ICollisionPolicy
     {
         private readonly int _agentId;
 
